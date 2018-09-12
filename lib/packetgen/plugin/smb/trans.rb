@@ -104,7 +104,7 @@ module PacketGen::Plugin
       #  Padding to align {#body} on 4-byte boundary.
       #  @return [String]
       define_field :pad1, PacketGen::Types::String, default: "\0" * 4,
-                   builder: ->(h, t) { s = t.new(length_from: -> { h.data_offset - SMB.new.sz - (h.offset_of(:name) + h[:name].sz) }) }
+                   builder: ->(h, t) { t.new(length_from: -> { h.data_offset - SMB.new.sz - (h.offset_of(:name) + h[:name].sz) }) }
       define_field :body, PacketGen::Types::String
 
       # Give protocol name for this class
@@ -181,8 +181,11 @@ module PacketGen::Plugin
       #  The size, in bytes, of the {#trans_name} field.
       #  @return [Integer]
       define_field :byte_count, PacketGen::Types::Int16le
+      # @!attribute pad1
+      #  Padding before {#file_name} to align it on 32-bit boundary
+      #  @return [Integer]
       define_field :pad1, PacketGen::Types::String, default: "\0" * 4,
-                   builder: ->(h, t) { s = t.new(length_from: -> { h.data_offset - SMB.new.sz - (h.offset_of(:byte_count) + h[:byte_count].sz) }) }
+                   builder: ->(h, t) { t.new(length_from: -> { h.data_offset - SMB.new.sz - (h.offset_of(:byte_count) + h[:byte_count].sz) }) }
       define_field :body, PacketGen::Types::String
 
       # Give protocol name for this class
@@ -193,7 +196,7 @@ module PacketGen::Plugin
     end
   end
   PacketGen::Header.add_class SMB::TransRequest
-  SMB.bind SMB::TransRequest, command: SMB::COMMANDS['trans'], flags: ->(v) { v.nil? ? 0 : (v & 0x80 == 0)}
+  SMB.bind SMB::TransRequest, command: SMB::COMMANDS['trans'], flags: ->(v) { v.nil? ? 0 : (v & 0x80).zero? }
   PacketGen::Header.add_class SMB::TransResponse
-  SMB.bind SMB::TransResponse, command: SMB::COMMANDS['trans'], flags: ->(v) { v.nil? ? 0 : (v & 0x80 == 0x80)}
+  SMB.bind SMB::TransResponse, command: SMB::COMMANDS['trans'], flags: ->(v) { v.nil? ? 0 : (v & 0x80 == 0x80) }
 end
