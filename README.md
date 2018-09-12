@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.com/sdaubert/packetgen-plugin-smb.svg?branch=master)](https://travis-ci.com/sdaubert/packetgen)
+
 # Packetgen::Plugin::SMB
 
 This is a plugin for [PacketGen gem](https://github.com/sdaubert/packetgen). It adds some support for SMB protocol suite.
