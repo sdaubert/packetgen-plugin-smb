@@ -9,7 +9,7 @@ module PacketGen::Plugin
   class SMB
     # Transaction Request.
     #
-    # See also {Blocks}, as {Trans} is a specialization of {Blocks#words}
+    # See also {Blocks}, as {TransRequest} is a specialization of {Blocks#words}
     # and {Blocks#bytes}.
     # @author Sylvain Daubert
     class TransRequest < PacketGen::Header::Base
@@ -89,10 +89,9 @@ module PacketGen::Plugin
       #  @return [Array]
       define_field :setup, PacketGen::Types::ArrayOfInt16le, builder: ->(h, t) { t.new(counter: h[:setup_count]) }
       # @!attribute byte_count
-      #  The size, in bytes, of the {#trans_name} field.
       #  @return [Integer]
       define_field :byte_count, PacketGen::Types::Int16le
-      # @!padname
+      # @!attribute padname
       #  8-bit optional padding to align {#name} on a 2-byte boundary.
       #  @return [Integer]
       define_field :padname, PacketGen::Types::Int8
@@ -116,7 +115,7 @@ module PacketGen::Plugin
 
     # Transaction Response.
     #
-    # See also {Blocks}, as {Trans} is a specialization of {Blocks#words}
+    # See also {Blocks}, as {TransResponse} is a specialization of {Blocks#words}
     # and {Blocks#bytes}.
     # @author Sylvain Daubert
     class TransResponse < PacketGen::Header::Base
@@ -178,11 +177,10 @@ module PacketGen::Plugin
       #  @return [ArrayPacketGen::]
       define_field :setup, PacketGen::Types::ArrayOfInt16le, builder: ->(h, t) { t.new(counter: h[:setup_count]) }
       # @!attribute byte_count
-      #  The size, in bytes, of the {#trans_name} field.
       #  @return [Integer]
       define_field :byte_count, PacketGen::Types::Int16le
       # @!attribute pad1
-      #  Padding before {#file_name} to align it on 32-bit boundary
+      #  Padding before {#body} to align it on 32-bit boundary
       #  @return [Integer]
       define_field :pad1, PacketGen::Types::String, default: "\0" * 4,
                    builder: ->(h, t) { t.new(length_from: -> { h.data_offset - SMB.new.sz - (h.offset_of(:byte_count) + h[:byte_count].sz) }) }

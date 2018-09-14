@@ -12,10 +12,10 @@ module PacketGen::Plugin
     # {Blocks} handles parameter block and data block. Parameter block is
     # composed of:
     # * a 8-bit {#word_count} field,
-    # * a {#words} field, an array of {Types::Int16le}.
+    # * a {#words} field, an array of +PacketGen::Types::Int16le+.
     # Data block is composed of:
     # * a little endian 16-bit {#byte_count} field,
-    # * a {#bytes} field, an array of {Types::Int8}.
+    # * a {#bytes} field, an array of +PacketGen::Types::Int8+.
     # @author Sylvain Daubert
     class Blocks < PacketGen::Header::Base
       # @!attribute word_count

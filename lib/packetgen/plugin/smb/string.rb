@@ -12,7 +12,7 @@ module PacketGen::Plugin
     class String < PacketGen::Types::CString
       # @param [Hash] options
       # @option options [Integer] :static_length set a static length for this string
-      def initialize(option={})
+      def initialize(options={})
         super
         self.encode('UTF-16LE')
       end
