@@ -20,6 +20,7 @@ module PacketGen::Plugin
     }.freeze
     # SMB marker, on start of header
     MARKER = PacketGen.force_binary("\xffSMB")
+
     # @!attribute protocol
     #  This field must contain {MARKER SMB marker}
     #  @return [String]
@@ -44,7 +45,7 @@ module PacketGen::Plugin
     #  16 high order bits of a process identifier (PID)
     #  @return [Integer]
     define_field :pid_high, PacketGen::Types::Int16le
-    # @!security_features
+    # @!attribute sec_features
     #  64-bit field. May be:
     #  * a 64-bit cryptographic message signature if signature was negotiated,
     #  * a SecurityFeatures structure, only over connectionless transport,
@@ -54,7 +55,7 @@ module PacketGen::Plugin
     #    * a 32-bit key to validate message,
     #  * a reserved field in all others cases.
     #  @return [Integer]
-    define_field :security_features, PacketGen::Types::Int64le
+    define_field :sec_features, PacketGen::Types::Int64le
     # @!attribute reserved
     #  16-bit reserved field
     #  @return [Integer]
