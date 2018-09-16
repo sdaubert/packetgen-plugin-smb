@@ -38,8 +38,7 @@ module PacketGen::Plugin
         end
 
         it 'raises when both time and filetime parameters are given' do
-          t = Time.now
-          expect { Filetime.new(filetime: 0, time: Time) }.to raise_error(ArgumentError)
+          expect { Filetime.new(filetime: 0, time: Time.now) }.to raise_error(ArgumentError)
         end
       end
 

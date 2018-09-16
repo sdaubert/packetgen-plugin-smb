@@ -35,9 +35,9 @@ module PacketGen::Plugin
         @int = SInt64le.new(options[:filetime])
         if options[:time]
           @time = options[:time]
-          @int.value = time2filetime(@time)
+          @int.value = time2filetime
         else
-          @time = filetime2time(to_i)
+          @time = filetime2time
         end
       end
 
@@ -45,7 +45,7 @@ module PacketGen::Plugin
       # @return [String] self
       def read(str)
         @int.read(str[0, 8])
-        @time = filetime2time(to_i)
+        @time = filetime2time
         self
       end
 
@@ -88,21 +88,20 @@ module PacketGen::Plugin
 
       private
 
-      def filetime2time(filetime)
+      def filetime2time
+        filetime = @int.to_i
         secs = filetime / 10_000
         nsecs = (filetime % 10_000) * 100
         if filetime.zero?
           NO_TIME
         elsif filetime.positive?
-          #Time.at(NO_TIME.to_i + secs, nsecs, :nsec)
           Time.at(NO_TIME) + Rational("#{secs}.%09d" % nsecs)
         else
-          #Time.at(Time.now.to_i + secs, nsecs, :nsec)
           Time.at(Time.now.utc) + Rational("#{secs}.%09d" % nsecs)
         end
       end
 
-      def time2filetime(time)
+      def time2filetime
         # Time#to_f then #to_r is more precise than Time#to_r
         # (ie Time#to_r sometimes does a rounding error).
         (@time.to_i - NO_TIME.to_i) * 10_000 + ((@time.to_f.to_r * 10_000) % 10_000).to_i
