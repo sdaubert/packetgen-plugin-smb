@@ -156,4 +156,5 @@ end
 require_relative 'smb/string'
 require_relative 'smb/filetime'
 require_relative 'smb/trans'
+require_relative 'smb/nt_create_andx'
 require_relative 'smb/blocks'
