@@ -10,6 +10,7 @@ require 'packetgen-plugin-smb'
 Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each {|f| require f}
 RSpec.configure do |c|
   c.include BindingHelper
+  c.include StringHelper
 end
 
 def read_packets(filename)
