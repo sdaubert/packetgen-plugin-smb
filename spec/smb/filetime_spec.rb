@@ -45,9 +45,8 @@ module PacketGen::Plugin
 
       describe '#to_s' do
         it 'returns a binary string with filetime encoded as an Int64le' do
-          time1 = Time.utc(2018, 9, 14, 15, 4, 14)
-          time2 = Time.at(time1.to_i, 229_239_243, :nsec)
-          ft = Filetime.new(time: time2)
+          time = Time.utc(2018, 9, 14, 15, 4, 14) + Rational('0.229_239_243')
+          ft = Filetime.new(time: time)
           expect(ft.to_s).to eq(force_binary("\xd4\x39\x3c\x5d\xe2\x77\x00\x00"))
         end
       end
