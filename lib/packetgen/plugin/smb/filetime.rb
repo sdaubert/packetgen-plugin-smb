@@ -21,7 +21,7 @@ module PacketGen::Plugin
     class Filetime
       # Base time for SMB FILETIME.
       # This value also indicate no time.
-      NO_TIME = Time.local(1601).freeze
+      NO_TIME = Time.utc(1601).freeze
 
       # @param [Hash] options
       # @option options [Integer] :filetime
@@ -29,8 +29,9 @@ module PacketGen::Plugin
       # @raise [ArgumentError] if +:time+ and +:filetime+ are both given.
       def initialize(options={})
         if (options.keys & %i[time filetime]).size == 2
-          raise ArgumentError, ":time and :filetime options are both given"
+          raise ArgumentError, ':time and :filetime options are both given'
         end
+
         @int = SInt64le.new(options[:filetime])
         if options[:time]
           @time = options[:time]
@@ -93,14 +94,16 @@ module PacketGen::Plugin
         if filetime.zero?
           NO_TIME
         elsif filetime.positive?
-          Time.at(NO_TIME.to_i + secs, nsecs, :nsec)
+          #Time.at(NO_TIME.to_i + secs, nsecs, :nsec)
+          Time.at(NO_TIME) + Rational("#{secs}.%09d" % nsecs)
         else
-          Time.at(Time.now.to_i + secs, nsecs, :nsec)
+          #Time.at(Time.now.to_i + secs, nsecs, :nsec)
+          Time.at(Time.now.utc) + Rational("#{secs}.%09d" % nsecs)
         end
       end
 
       def time2filetime(time)
-        # Time#to_f when #to_r is more precise than Time#to_r
+        # Time#to_f then #to_r is more precise than Time#to_r
         # (ie Time#to_r sometimes does a rounding error).
         (@time.to_i - NO_TIME.to_i) * 10_000 + ((@time.to_f.to_r * 10_000) % 10_000).to_i
       end

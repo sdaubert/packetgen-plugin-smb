@@ -19,14 +19,14 @@ module PacketGen::Plugin
           time = Time.new(2018, 9, 14, 0, 0, 0.144)
           expect { ft = Filetime.new(time: time) }.to_not raise_error
           expect(ft.to_time).to eq(time)
-          expect(ft.to_i).to eq(131_813_501_611_440)
+          expect(ft.to_i).to eq(131_813_496_001_440)
         end
 
         it 'accepts a filetime parameter' do
           ft = nil
           ftime = 365 * 3_600 * 24 * 10_000
           expect { ft = Filetime.new(filetime: ftime) }.to_not raise_error
-          expect(ft.to_time).to eq(Time.new(1602))
+          expect(ft.to_time).to eq(Time.utc(1602))
         end
 
         it 'accepts a negative filetime parameter' do
@@ -45,10 +45,10 @@ module PacketGen::Plugin
 
       describe '#to_s' do
         it 'returns a binary string with filetime encoded as an Int64le' do
-          time1 = Time.new(2018, 9, 14, 15, 04, 14)
+          time1 = Time.new(2018, 9, 14, 15, 4, 14)
           time2 = Time.at(time1.to_i, 229239243, :nsec)
           ft = Filetime.new(time: time2)
-          expect(ft.to_s).to eq(force_binary("\xe4\x31\x47\x59\xe2\x77\x00\x00"))
+          expect(ft.to_s).to eq(force_binary("\xd4\x97\xf1\x58\xe2\x77\x00\x00"))
         end
       end
 
