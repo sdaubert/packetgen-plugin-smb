@@ -9,7 +9,7 @@ module PacketGen::Plugin
         pkt = pkts[3]
         expect(pkt.is? 'NetBIOS::Session').to be(true)
         expect(pkt.is? 'SMB').to be(true)
-        expect(pkt.smb[:command].to_human).to eq('nt_create_andx')
+        expect(pkt.smb[:command].to_human).to eq('nt_create_and_x')
         expect(pkt.smb.flags_reply?).to be(false)
         expect(pkt.is? 'SMB::NtCreateAndXRequest').to be(true)
         expect(pkt.smb.body).to be_a(SMB::NtCreateAndXRequest)
@@ -62,7 +62,7 @@ module PacketGen::Plugin
         pkt = pkts[4]
         expect(pkt.is? 'NetBIOS::Session').to be(true)
         expect(pkt.is? 'SMB').to be(true)
-        expect(pkt.smb[:command].to_human).to eq('nt_create_andx')
+        expect(pkt.smb[:command].to_human).to eq('nt_create_and_x')
         expect(pkt.smb.flags_reply?).to be(true)
         expect(pkt.is? 'SMB::NtCreateAndXResponse').to be(true)
         expect(pkt.smb.body).to be_a(SMB::NtCreateAndXResponse)

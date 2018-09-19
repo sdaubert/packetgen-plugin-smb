@@ -16,7 +16,7 @@ module PacketGen::Plugin
       'trans'          => 0x25,
       'echo'           => 0x2b,
       'negotiate'      => 0x72,
-      'nt_create_andx' => 0xa2
+      'nt_create_and_x' => 0xa2
     }.freeze
     # SMB marker, on start of header
     MARKER = PacketGen.force_binary("\xffSMB")
@@ -156,5 +156,5 @@ end
 require_relative 'smb/string'
 require_relative 'smb/filetime'
 require_relative 'smb/trans'
-require_relative 'smb/nt_create_andx'
+require_relative 'smb/nt_create_and_x'
 require_relative 'smb/blocks'

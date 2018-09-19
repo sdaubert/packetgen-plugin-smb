@@ -7,6 +7,36 @@
 
 module PacketGen::Plugin
   class SMB
+    # SMB Command NtCreateAndX request.
+
+    # A NtCreateAndXRequest contains:
+    # * a {#word_count} field (+Int8+), size, in 2-byte words of SMB
+    #   parameters:
+    #   * {#and_xcommand} (+Int8+), next command in packet,
+    #   * {#rsv1} (+Int8+),
+    #   * {#and_xoffset} (+Int16le+), offset of the next command from the
+    #     start of SMB header,
+    #   * {#rsv2} (+Int8+),
+    #   * {#filename_len} (+Int16le+), size of {#filename} in SMB data,
+    #   * {#flags} (+Int32le+),
+    #   * {#root_dir_fid} (+Int32le+),
+    #   * {#access_mask} (+Int32le+),
+    #   * {#alloc_size} (+Int64le+),
+    #   * {#attributes} (+Int32le+),
+    #   * {#share_access} (+Int32le+),
+    #   * {#disposition} (+Int32le+),
+    #   * {#options} (+Int32le+),
+    #   * {#impersonation} (+Int32le+),
+    #   * {#sec_flags} (+Int38+),
+    # * #{byte_count} (+Int16le+), size in bytes of SMB data:
+    #   * {#pad1} (+Int8),
+    #   * {#filename} ({SMB::String}),
+    #   * {#extra_bytes} (+String+).
+    #
+    # == Known limitations
+    # 1. Only the first command is properly handled. Chained commands are not.
+    # 2. {#filename} is mandatory handled as Windows Unicode string.
+    # @author Sylvain Daubert
     class NtCreateAndXRequest < PacketGen::Header::Base
       # Commands that may follow this one in a SMB packet
       COMMANDS = {
@@ -14,7 +44,8 @@ module PacketGen::Plugin
         'read_andx' => 0x2e,
         'ioctl' => 0x27,
         'no further commands' => 0xff
-      }
+      }.freeze
+
       # @!attribute word_count
       #  The size, in 2-byte words, of the SMB parameters.
       #  @return [Integer]
@@ -84,7 +115,7 @@ module PacketGen::Plugin
       #  the application.
       #  @return [Integer]
       define_field :impersonation, PacketGen::Types::Int32le
-      # @!attribute security_flags
+      # @!attribute sec_flags
       #  8-bit security flags.
       define_field :sec_flags, PacketGen::Types::Int8
       # @!attribute byte_count
@@ -103,7 +134,7 @@ module PacketGen::Plugin
       # @!attribute extra_bytes
       #  @return [Integer]
       define_field :extra_bytes, PacketGen::Types::String,
-                   builder: ->(h, t) { t.new(length_from: -> { h.byte_count - 1 - h[:filename].sz } ) }
+                   builder: ->(h, t) { t.new(length_from: -> { h.byte_count - 1 - h[:filename].sz }) }
 
       # Give protocol name for this class
       # @return [String]
@@ -120,6 +151,8 @@ module PacketGen::Plugin
       end
     end
 
+    # SMB Command NtCreateAndX response
+    # @author Sylvain Daubert
     class NtCreateAndXResponse < PacketGen::Header::Base
       # OpLock levels
       OP_LOCK_LEVELS = {
@@ -127,7 +160,7 @@ module PacketGen::Plugin
         'exclusive' => 1,
         'batch' => 2,
         'level II' => 3,
-      }
+      }.freeze
 
       # @!attribute word_count
       #  The size, in 2-byte words, of the SMB parameters.
