@@ -9,6 +9,8 @@ module PacketGen::Plugin
   class SMB
     # 64-bit signed integer, little endian representation
     # @author Sylvain Daubert
+    # @private
+    # @since 0.1.0
     class SInt64le < PacketGen::Types::Int64le
       def initialize(value=nil)
         super
@@ -18,6 +20,7 @@ module PacketGen::Plugin
 
     # SMB FILETIME.
     # @author Sylvain Daubert
+    # @since 0.1.0
     class Filetime
       # Base time for SMB FILETIME.
       # This value also indicate no time.
@@ -68,7 +71,7 @@ module PacketGen::Plugin
       # Check if there is no time specified
       # @return [Boolean]
       def no_time?
-        to_i == 0
+        to_i.zero?
       end
 
       # @return [Integer]

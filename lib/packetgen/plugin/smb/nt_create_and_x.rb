@@ -37,6 +37,7 @@ module PacketGen::Plugin
     # 1. Only the first command is properly handled. Chained commands are not.
     # 2. {#filename} is mandatory handled as Windows Unicode string.
     # @author Sylvain Daubert
+    # @since 0.1.0
     class NtCreateAndXRequest < PacketGen::Header::Base
       # Commands that may follow this one in a SMB packet
       COMMANDS = {
@@ -153,6 +154,7 @@ module PacketGen::Plugin
 
     # SMB Command NtCreateAndX response
     # @author Sylvain Daubert
+    # @since 0.1.0
     class NtCreateAndXResponse < PacketGen::Header::Base
       # OpLock levels
       OP_LOCK_LEVELS = {

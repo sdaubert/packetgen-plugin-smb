@@ -12,6 +12,7 @@ module PacketGen::Plugin
     # See also {Blocks}, as {TransRequest} is a specialization of {Blocks#words}
     # and {Blocks#bytes}.
     # @author Sylvain Daubert
+    # @since 0.1.0
     class TransRequest < PacketGen::Header::Base
       # @!attribute word_count
       #  The size, in 2-byte words, of the SMB command parameters. It should
@@ -118,6 +119,7 @@ module PacketGen::Plugin
     # See also {Blocks}, as {TransResponse} is a specialization of {Blocks#words}
     # and {Blocks#bytes}.
     # @author Sylvain Daubert
+    # @since 0.1.0
     class TransResponse < PacketGen::Header::Base
       # @!attribute word_count
       #  The size, in 2-byte words, of the SMB command parameters. It should
