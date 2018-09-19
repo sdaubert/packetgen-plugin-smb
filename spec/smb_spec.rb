@@ -15,8 +15,8 @@ module PacketGen::Plugin
       it 'creates a SMB header with default values' do
         smb = SMB.new
         expect(smb.protocol).to eq(SMB::MARKER)
-        expect(smb.command).to eq(4)
-        expect(smb[:command].to_human).to eq('close')
+        expect(smb.command).to eq(1)
+        expect(smb[:command].to_human).to eq('delete_dir')
         expect(smb.status).to eq(0)
         expect(smb.flags).to eq(0)
         expect(smb.flags2).to eq(0)
