@@ -192,9 +192,7 @@ module PacketGen::Plugin
         'SMB::TransResponse'
       end
     end
+
+    self.bind_command 'trans'
   end
-  PacketGen::Header.add_class SMB::TransRequest
-  SMB.bind SMB::TransRequest, command: SMB::COMMANDS['trans'], flags: ->(v) { v.nil? ? 0 : (v & 0x80).zero? }
-  PacketGen::Header.add_class SMB::TransResponse
-  SMB.bind SMB::TransResponse, command: SMB::COMMANDS['trans'], flags: ->(v) { v.nil? ? 0 : (v & 0x80 == 0x80) }
 end

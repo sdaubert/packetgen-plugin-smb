@@ -265,9 +265,7 @@ module PacketGen::Plugin
         class_eval "def human_#{type}_time; self[:#{type}_time].to_human; end"
       end
     end
+
+    self.bind_command 'nt_create_and_x'
   end
-  PacketGen::Header.add_class SMB::NtCreateAndXRequest
-  SMB.bind SMB::NtCreateAndXRequest, command: SMB::COMMANDS['nt_create_andx'], flags: ->(v) { v.nil? ? 0 : (v & 0x80).zero? }
-  PacketGen::Header.add_class SMB::NtCreateAndXResponse
-  SMB.bind SMB::NtCreateAndXResponse, command: SMB::COMMANDS['nt_create_andx'], flags: ->(v) { v.nil? ? 0 : (v & 0x80 == 0x80) }
 end

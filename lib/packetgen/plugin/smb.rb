@@ -147,6 +147,19 @@ module PacketGen::Plugin
                          :flags2_is_long_name, :flags2_rsv,
                          :flags2_security_signature_required, :flags2_compresses,
                          :flags2_signature, :flags2_eas, :flags2_long_names
+
+    # Helper to bind a SMB command to {SMB} header.
+    # @param [String] command name
+    # @return [void]
+    def self.bind_command(command)
+      contantized = command.capitalize.gsub(/_(\w)/) { $1.upcase }
+      krequest = self.const_get("#{contantized}Request")
+      kresponse = self.const_get("#{contantized}Response")
+      PacketGen::Header.add_class krequest
+      self.bind krequest, command: SMB::COMMANDS[command], flags: ->(v) { v.nil? ? 0 : (v & 0x80).zero? }
+      PacketGen::Header.add_class kresponse
+      self.bind kresponse, command: SMB::COMMANDS[command], flags: ->(v) { v.nil? ? 0 : (v & 0x80 == 0x80) }
+    end
   end
   PacketGen::Header.add_class SMB
   PacketGen::Header::NetBIOS::Session.bind SMB, body: ->(val) { val.nil? ? SMB::MARKER : val[0..3] == SMB::MARKER }
