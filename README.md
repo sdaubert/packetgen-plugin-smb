@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/sdaubert/packetgen-plugin-smb.svg?branch=master)](https://travis-ci.com/sdaubert/packetgen)
+[![Build Status](https://travis-ci.com/sdaubert/packetgen-plugin-smb.svg?branch=master)](https://travis-ci.com/sdaubert/packetgen-plugin-smb)
 
 # Packetgen::Plugin::SMB
 
