@@ -8,14 +8,25 @@
 module PacketGen::Plugin
   # Server Message Block (SMB) header.
   # @author Sylvain Daubert
-  # @since 2.8.0
+  # @since 0.1.0
   class SMB < PacketGen::Header::Base
     # Known commands
     COMMANDS = {
+      'delete_dir'     => 0x01,
       'close'          => 0x04,
+      'delete'         => 0x06,
+      'query_info2'    => 0x23,
       'trans'          => 0x25,
       'echo'           => 0x2b,
-      'negotiate'      => 0x72,
+      'open_and_x'     => 0x2d,
+      'read_and_x'     => 0x2e,
+      'write_and_x'    => 0x2f,
+      'trans2'         => 0x32,
+      'tree_disconnect' => 0x71,
+      'negotiate' => 0x72,
+      'session_setup_and_x' => 0x73,
+      'tree_connect_and_x' => 0x75,
+      'nt_trans' => 0xa0,
       'nt_create_and_x' => 0xa2
     }.freeze
     # SMB marker, on start of header
