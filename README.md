@@ -24,6 +24,10 @@ Or install it yourself as:
 
 TODO
 
+## License
+
+MIT License (see [LICENSE](https://github.com/sdaubert/packetgen/blob/master/LICENSE))
+
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/sdaubert/packetgen-plugin-smb.
