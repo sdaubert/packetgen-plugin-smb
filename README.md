@@ -1,3 +1,4 @@
+[![Gem Version](https://badge.fury.io/rb/packetgen-plugin-smb.svg)](https://badge.fury.io/rb/packetgen-plugin-smb)
 [![Build Status](https://travis-ci.com/sdaubert/packetgen-plugin-smb.svg?branch=master)](https://travis-ci.com/sdaubert/packetgen-plugin-smb)
 
 # Packetgen::Plugin::SMB
