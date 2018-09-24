@@ -124,18 +124,19 @@ module PacketGen::Plugin
       #  @return [Integer]
       define_field :byte_count, PacketGen::Types::Int16le
       # @!attribute pad1
-      #  Padding before {#filename} to align it on 16-bit boundary
+      #  Padding before {#filename} to align it on 16-bit boundary. Only present
+      #  if {SMB#flags2_unicode?} is +true+.
       #  @return [Integer]
-      define_field :pad1, PacketGen::Types::Int8
+      define_field :pad1, PacketGen::Types::Int8, optional: ->(h) { h.packet && h.packet.smb.flags2_unicode? }
       # @!attribute filename
       #  A string that represents the fully qualified name of the file
       #  relative to the supplied TID
       # @return [String]
-      define_field :filename, SMB::String
+      define_field :filename, SMB::String, builder: ->(h, t) { t.new(unicode: !h.packet || h.packet.smb.flags2_unicode?) }
       # @!attribute extra_bytes
       #  @return [Integer]
       define_field :extra_bytes, PacketGen::Types::String,
-                   builder: ->(h, t) { t.new(length_from: -> { h.byte_count - 1 - h[:filename].sz }) }
+                   builder: ->(h, t) { t.new(length_from: -> { h.byte_count - (h.present?(:pad1) ? 1 : 0) - h[:filename].sz }) }
 
       # Give protocol name for this class
       # @return [String]
@@ -147,7 +148,8 @@ module PacketGen::Plugin
       # @return [void]
       def calc_length
         self.filename_len = self[:filename].sz
-        bcount = 1 + filename_len + self[:extra_bytes].sz
+        pad1sz = self.present?(:pad1) ? 1 : 0
+        bcount = pad1sz + filename_len + self[:extra_bytes].sz
         self.byte_count = bcount
       end
     end

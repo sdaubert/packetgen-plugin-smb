@@ -93,13 +93,14 @@ module PacketGen::Plugin
       #  @return [Integer]
       define_field :byte_count, PacketGen::Types::Int16le
       # @!attribute padname
-      #  8-bit optional padding to align {#name} on a 2-byte boundary.
+      #  8-bit optional padding to align {#name} on a 2-byte boundary. Only present
+      #  if {SMB#flags2_unicode?} is +true+.
       #  @return [Integer]
-      define_field :padname, PacketGen::Types::Int8
+      define_field :padname, PacketGen::Types::Int8, optional: ->(h) { h.packet && h.packet.smb.flags2_unicode? }
       # @!attribute name
       #  Pathname of the mailslot or named pipe.
       #  @return [String]
-      define_field :name, SMB::String
+      define_field :name, SMB::String, builder: ->(h, t) { t.new(unicode: !h.packet || h.packet.smb.flags2_unicode?) }
       # @!attribute pad1
       #  Padding to align {#body} on 4-byte boundary.
       #  @return [String]

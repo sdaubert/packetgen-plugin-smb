@@ -36,23 +36,36 @@ module PacketGen::Plugin
       end
 
       describe '#calc_length' do
-        let(:pkt) { PacketGen.gen('IP').add('TCP').add('NetBIOS::Session').add('SMB', status: 0xff).add('SMB::NtCreateAndXRequest', filename: '\\PIPE\\') }
+        let(:pkt1) { PacketGen.gen('IP').add('TCP').add('NetBIOS::Session').add('SMB', status: 0xff, flags2: 0x8000).add('SMB::NtCreateAndXRequest', filename: '\\PIPE\\') }
+        let(:pkt2) { PacketGen.gen('IP').add('TCP').add('NetBIOS::Session').add('SMB', status: 0xff).add('SMB::NtCreateAndXRequest', filename: '\\PIPE\\') }
 
         it 'calculates filename length' do
-          pkt.calc
-          expect(pkt.smb_ntcreateandxrequest.filename_length).to eq(14)
+          pkt1.calc
+          pkt2.calc
+          expect(pkt1.smb_ntcreateandxrequest.filename_length).to eq(14)
+          expect(pkt2.smb_ntcreateandxrequest.filename_length).to eq(7)
         end
 
         it 'calculates byte count' do
-          pkt.calc
-          expect(pkt.smb_ntcreateandxrequest.byte_count).to eq(15)
-          pkt.smb_ntcreateandxrequest[:filename].from_human('a')
-          pkt.calc
-          expect(pkt.smb_ntcreateandxrequest.byte_count).to eq(5)
-          pkt.smb_ntcreateandxrequest.byte_count = 9
-          pkt.smb_ntcreateandxrequest[:extra_bytes].read('abcd')
-          pkt.calc
-          expect(pkt.smb_ntcreateandxrequest.byte_count).to eq(9)
+          pkt1.calc
+          expect(pkt1.smb_ntcreateandxrequest.byte_count).to eq(15)
+          pkt1.smb_ntcreateandxrequest[:filename].from_human('a')
+          pkt1.calc
+          expect(pkt1.smb_ntcreateandxrequest.byte_count).to eq(5)
+          pkt1.smb_ntcreateandxrequest.byte_count = 9
+          pkt1.smb_ntcreateandxrequest[:extra_bytes].read('abcd')
+          pkt1.calc
+          expect(pkt1.smb_ntcreateandxrequest.byte_count).to eq(9)
+
+          pkt2.calc
+          expect(pkt2.smb_ntcreateandxrequest.byte_count).to eq(7)
+          pkt2.smb_ntcreateandxrequest[:filename].from_human('a')
+          pkt2.calc
+          expect(pkt2.smb_ntcreateandxrequest.byte_count).to eq(2)
+          pkt2.smb_ntcreateandxrequest.byte_count = 6
+          pkt2.smb_ntcreateandxrequest[:extra_bytes].read('abcd')
+          pkt2.calc
+          expect(pkt2.smb_ntcreateandxrequest.byte_count).to eq(6)
         end
       end
     end
