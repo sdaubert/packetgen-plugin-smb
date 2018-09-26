@@ -7,17 +7,6 @@
 
 module PacketGen::Plugin
   class SMB
-    # 64-bit signed integer, little endian representation
-    # @author Sylvain Daubert
-    # @private
-    # @since 0.1.0
-    class SInt64le < PacketGen::Types::Int64le
-      def initialize(value=nil)
-        super
-        @packstr[:little] = 'q<'
-      end
-    end
-
     # SMB FILETIME.
     # @author Sylvain Daubert
     # @since 0.1.0
@@ -35,7 +24,7 @@ module PacketGen::Plugin
           raise ArgumentError, ':time and :filetime options are both given'
         end
 
-        @int = SInt64le.new(options[:filetime])
+        @int = PacketGen::Types::SInt64le.new(options[:filetime])
         if options[:time]
           @time = options[:time]
           @int.value = time2filetime
