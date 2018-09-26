@@ -9,7 +9,6 @@ module PacketGen::Plugin
   class SMB
     # SMB FILETIME.
     # @author Sylvain Daubert
-    # @since 0.1.0
     class Filetime
       # Base time for SMB FILETIME.
       # This value also indicate no time.

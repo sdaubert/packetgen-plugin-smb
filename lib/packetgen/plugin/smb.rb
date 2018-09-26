@@ -8,7 +8,6 @@
 module PacketGen::Plugin
   # Server Message Block (SMB) header.
   # @author Sylvain Daubert
-  # @since 0.1.0
   class SMB < PacketGen::Header::Base
     # Known commands
     COMMANDS = {

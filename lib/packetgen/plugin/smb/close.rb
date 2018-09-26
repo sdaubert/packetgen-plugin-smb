@@ -9,7 +9,6 @@ module PacketGen::Plugin
   class SMB
     # Close Request.
     # @author Sylvain Daubert
-    # @since 0.1.0
     class CloseRequest < PacketGen::Header::Base
       # @!attribute word_count
       #  The size, in 2-byte words, of the SMB command parameters. It should

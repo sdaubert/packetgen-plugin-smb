@@ -9,7 +9,6 @@ module PacketGen::Plugin
   class SMB
     # SMB strings (UTF-16 little-endian).
     # @author Sylvain Daubert
-    # @since 0.1.0
     class String < PacketGen::Types::CString
       # @param [Boolean] unicode
       attr_writer :unicode

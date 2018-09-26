@@ -17,7 +17,6 @@ module PacketGen::Plugin
     # * a little endian 16-bit {#byte_count} field,
     # * a {#bytes} field, an array of +PacketGen::Types::Int8+.
     # @author Sylvain Daubert
-    # @since 0.1.0
     class Blocks < PacketGen::Header::Base
       # @!attribute word_count
       #  The size, in 2-byte words, of the {#words} field.
