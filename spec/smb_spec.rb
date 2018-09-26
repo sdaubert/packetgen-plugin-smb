@@ -72,6 +72,12 @@ module PacketGen::Plugin
         expect(pkt.smb_blocks.words.map(&:to_i)).to eq([1])
         expect(pkt.smb_blocks.byte_count).to eq(16)
         expect(pkt.smb_blocks.bytes.map(&:to_i)).to eq([0] * 16)
+
+        stri = pkt.smb.inspect
+        flags = stri.lines.reject { |l| l !~ /flags:/ }.first.split(':')[1].strip.split(' ').first
+        expect(flags).to eq('canon_paths,case_insensitive')
+        flags2 = stri.lines.reject { |l| l !~ /flags2:/ }.first.split(':')[1].strip.split(' ').first
+        expect(flags2).to eq('unicode,ntstatus,extended_security,is_long_name,eas,long_names')
       end
     end
   end
