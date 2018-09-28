@@ -15,6 +15,7 @@ module PacketGen::Plugin
       # @author Sylvain Daubert
       class HostAnnouncement < Browser
         delete_field :body
+        update_field :opcode, default: 1
         # @!attribute update_count
         #  8-bit integer. Not used. Should be 0
         #  @return [Integer]
@@ -58,6 +59,7 @@ module PacketGen::Plugin
         #  @return [String]
         define_field :comment, PacketGen::Types::CString
 
+        # @return [String]
         def protocol_name
           'SMB::Browser::HostAnnouncement'
         end

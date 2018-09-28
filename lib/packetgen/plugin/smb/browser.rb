@@ -21,7 +21,7 @@ module PacketGen::Plugin
         'DomainAnnouncement' => 12,
         'MasterAnnouncement' => 13,
         'ResetStateRequest' => 14,
-        'LocalMaster' => 15
+        'LocalMasterAnnouncement' => 15
       }.freeze
 
       # @!attribute opcode
@@ -86,3 +86,5 @@ module PacketGen::Plugin
 end
 
 require_relative 'browser/host_announcement'
+require_relative 'browser/domain_announcement'
+require_relative 'browser/local_master_announcement'
