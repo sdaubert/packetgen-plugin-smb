@@ -14,7 +14,7 @@ module PacketGen::Plugin
       # specify the types of resources and services it supports.
       # @author Sylvain Daubert
       class HostAnnouncement < Browser
-        delete_field :body
+        remove_field :body
         update_field :opcode, default: 1
         # @!attribute update_count
         #  8-bit integer. Not used. Should be 0
