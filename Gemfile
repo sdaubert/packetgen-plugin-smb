@@ -1,6 +1,5 @@
 source 'https://rubygems.org'
 
-git_source(:github) {|repo_name| "https://github.com/#{repo_name}" }
+gem 'packetgen', git: 'https://github.com/sdaubert/packetgen.git', branch: 'prepare-v3.0.0'
 
-# Specify your gem's dependencies in packetgen-plugin-smb.gemspec
 gemspec
