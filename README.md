@@ -27,7 +27,7 @@ TODO
 
 ## License
 
-MIT License (see [LICENSE](https://github.com/sdaubert/packetgen/blob/master/LICENSE))
+MIT License (see [LICENSE](https://github.com/sdaubert/packetgen-plugin-smb/blob/master/LICENSE))
 
 ## Contributing
 
