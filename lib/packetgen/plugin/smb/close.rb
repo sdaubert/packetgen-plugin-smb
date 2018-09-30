@@ -31,6 +31,12 @@ module PacketGen::Plugin
       #  Should be 0.
       #  @return [Integer]
       define_field :byte_count, PacketGen::Types::Int16le, default: 0
+
+      # Give protocol name for this class
+      # @return [String]
+      def protocol_name
+        'SMB::CloseRequest'
+      end
     end
 
     # Close Response.
@@ -49,6 +55,12 @@ module PacketGen::Plugin
       #  Should be 0.
       #  @return [Integer]
       define_field :byte_count, PacketGen::Types::Int16le, default: 0
+
+      # Give protocol name for this class
+      # @return [String]
+      def protocol_name
+        'SMB::CloseResponse'
+      end
     end
 
     self.bind_command 'close'
