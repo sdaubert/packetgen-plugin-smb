@@ -7,7 +7,7 @@ module PacketGen::Plugin
   describe SMB2 do
     describe 'binding' do
       it 'in NetBIOS packets' do
-        expect(PacketGen::Header::NetBIOS::Session).to know_header(SMB2).with(body: SMB2::MARKER)
+        expect(NetBIOS::Session).to know_header(SMB2).with(body: SMB2::MARKER)
       end
     end
 
