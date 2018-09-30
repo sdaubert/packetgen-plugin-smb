@@ -11,7 +11,7 @@ module PacketGen::Plugin
   module NetBIOS
     # NetBIOS Name.
     # @author Sylvain Daubert
-    class Name < DNS::Name
+    class Name < PacketGen::Header::DNS::Name
       # Size, in bytes, of an encoded NetBIOS name
       ENCODED_NAME_SIZE = 32
 

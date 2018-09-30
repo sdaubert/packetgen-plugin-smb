@@ -36,7 +36,7 @@ module PacketGen::Plugin
 
         # Give protocol name for this class
         # @return [String]
-        def protocol_name
+        def self.protocol_name
           'SMB::Close::Request'
         end
       end

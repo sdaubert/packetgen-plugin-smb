@@ -11,7 +11,13 @@ module PacketGen::Plugin
   module NetBIOS
     # NetBIOS Session Service messages.
     # @author Sylvain Daubert
-    class Session < Base
+    class Session < PacketGen::Header::Base
+      # Give protocol name
+      # @return [String]
+      def self.protocol_name
+        'NetBIOS::Session'
+      end
+
       # Port number for NetBIOS Session Service over TCP
       TCP_PORT = 139
       # Port number for NetBIOS Session Service over TCP (mainly used yb {SMB2})

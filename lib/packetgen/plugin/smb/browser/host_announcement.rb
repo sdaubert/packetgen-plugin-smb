@@ -14,6 +14,14 @@ module PacketGen::Plugin
       # specify the types of resources and services it supports.
       # @author Sylvain Daubert
       class HostAnnouncement < Browser
+        # @return [String]
+        def self.protocol_name
+          return @protocol_name if @protocol_name
+
+          basename = to_s.sub(/^.*::/, '')
+          @protocol_name = "SMB::Browser::#{basename}"
+        end
+
         remove_field :body
         update_field :opcode, default: 1
         # @!attribute update_count
@@ -58,11 +66,6 @@ module PacketGen::Plugin
         #  Null-terminated ASCII string.
         #  @return [String]
         define_field :comment, PacketGen::Types::CString
-
-        # @return [String]
-        def protocol_name
-          'SMB::Browser::HostAnnouncement'
-        end
       end
       PacketGen::Header.add_class HostAnnouncement
       SMB::Trans::Request.bind HostAnnouncement, name: '\\MAILSLOT\\BROWSE', body: ->(v) { v[0] == OPCODES['HostAnnouncement'] }

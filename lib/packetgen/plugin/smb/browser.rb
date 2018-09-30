@@ -11,6 +11,12 @@ module PacketGen::Plugin
     # See subclasses.
     # @author Sylvain Daubert
     class Browser < PacketGen::Header::Base
+      # Give protocol name for this class
+      # @return [String]
+      def self.protocol_name
+        'SMB::Browser'
+      end
+
       OPCODES = {
         'HostAnnouncement' => 1,
         'HostAnnouncementReq' => 2,
@@ -55,12 +61,6 @@ module PacketGen::Plugin
         else
           private_read str
         end
-      end
-
-      # Give protocol name for this class
-      # @return [String]
-      def protocol_name
-        'SMB::Browser'
       end
 
       # Callback called when a Browser header is added to a packet.

@@ -15,11 +15,6 @@ module PacketGen::Plugin
       # @author Sylvain Daubert
       class LocalMasterAnnouncement < HostAnnouncement
         update_field :opcode, default: 15
-
-        # @return [String]
-        def protocol_name
-          'SMB::Browser::LocalMasterAnnouncement'
-        end
       end
       PacketGen::Header.add_class LocalMasterAnnouncement
       SMB::Trans::Request.bind LocalMasterAnnouncement, name: '\\MAILSLOT\\BROWSE', body: ->(v) { v[0] == OPCODES['LocalMasterAnnouncement'] }
