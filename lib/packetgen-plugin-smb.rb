@@ -5,6 +5,7 @@
 
 # frozen_string_literal: true
 
-require "packetgen"
-require_relative "packetgen/plugin/smb_version"
-require_relative "packetgen/plugin/smb"
+require 'packetgen'
+require_relative 'packetgen/plugin/smb_version'
+require_relative 'packetgen/plugin/smb'
+require_relative 'packetgen/plugin/smb2'
