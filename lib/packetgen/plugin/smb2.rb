@@ -32,7 +32,7 @@ module PacketGen::Plugin
       'oplock_break' => 18
     }.freeze
     # SMB marker, on start of header
-    MARKER = PacketGen.force_binary("\xfeSMB")
+    MARKER = PacketGen.force_binary("\xfeSMB").freeze
 
     # @!attribute protocol
     #  This field must contain {MARKER SMB2 marker}
@@ -144,6 +144,7 @@ module PacketGen::Plugin
       self.bind kresponse, command: SMB2::COMMANDS[command], flags: ->(v) { v.nil? ? 0 : (v & 1 == 1) }
     end
 
+    # @return [String]
     def inspect
       str = PacketGen::Inspect.dashed_line(self.class, 1)
       fields.each do |attr|
@@ -177,5 +178,6 @@ module PacketGen::Plugin
   PacketGen::Header::NetBIOS::Datagram.bind SMB2, body: ->(val) { val.nil? ? SMB2::MARKER : val[0..3] == SMB2::MARKER }
 end
 
-require 'smb2/error'
-require 'smb2/negotiate'
+require_relative 'smb2/base'
+require_relative 'smb2/error'
+require_relative 'smb2/negotiate'
