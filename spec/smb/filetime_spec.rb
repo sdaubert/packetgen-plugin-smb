@@ -19,12 +19,12 @@ module PacketGen::Plugin
           time = Time.utc(2018, 9, 14, 0, 0, 0.144)
           expect { ft = Filetime.new(time: time) }.to_not raise_error
           expect(ft.to_time).to eq(time)
-          expect(ft.to_i).to eq(131_813_568_001_440)
+          expect(ft.to_i).to eq(131_813_568_001_440_000)
         end
 
         it 'accepts a filetime parameter' do
           ft = nil
-          ftime = 365 * 3_600 * 24 * 10_000
+          ftime = 365 * 3_600 * 24 * Filetime::ONE_SEC
           expect { ft = Filetime.new(filetime: ftime) }.to_not raise_error
           expect(ft.to_time).to eq(Time.utc(1602))
         end
@@ -32,7 +32,7 @@ module PacketGen::Plugin
         it 'accepts a negative filetime parameter' do
           ft = nil
           # relative time: 1 min before now
-          ftime = -60 * 10_000
+          ftime = -60 * Filetime::ONE_SEC
           expect { ft = Filetime.new(filetime: ftime) }.to_not raise_error
           expect(ft.to_time).to be_within(1).of(Time.now - 60)
         end
@@ -46,14 +46,14 @@ module PacketGen::Plugin
         it 'returns a binary string with filetime encoded as an Int64le' do
           time = Time.utc(2018, 9, 14, 15, 4, 14) + Rational('0.229_239_243')
           ft = Filetime.new(time: time)
-          expect(ft.to_s).to eq(force_binary("\xd4\x39\x3c\x5d\xe2\x77\x00\x00"))
+          expect(ft.to_s).to eq(force_binary("\xa8\xe5\x41\x33\x3c\x4c\xd4\x01"))
         end
       end
 
       describe '#to_human' do
         it 'returns a human readable time' do
-          ft = Filetime.new(time: Time.new(2018, 9, 15, 15, 33, 27))
-          expect(ft.to_human).to match(/^2018-09-15 15:33:27 (?:\+\d{4}|UTC)/)
+          ft = Filetime.new(time: Time.utc(2018, 9, 15, 15, 33, 27))
+          expect(ft.to_human).to match(/^2018-09-15 15:33:27.000000000 (?:\+\d{4}|UTC)/)
         end
       end
     end

@@ -14,6 +14,9 @@ module PacketGen::Plugin
       # This value also indicate no time.
       NO_TIME = Time.utc(1601).freeze
 
+      # Numbers of 100ns in one second
+      ONE_SEC = 10_000_000
+
       # @param [Hash] options
       # @option options [Integer] :filetime
       # @option options [Time] :time
@@ -25,7 +28,7 @@ module PacketGen::Plugin
 
         @int = PacketGen::Types::SInt64le.new(options[:filetime])
         if options[:time]
-          @time = options[:time]
+          @time = options[:time].getgm
           @int.value = time2filetime
         else
           @time = filetime2time
@@ -46,7 +49,7 @@ module PacketGen::Plugin
         if no_time?
           'no time'
         else
-          @time.to_s
+          @time.strftime("%Y-%m-%d %H:%M:%S.%9N %Z")
         end
       end
 
@@ -81,21 +84,19 @@ module PacketGen::Plugin
 
       def filetime2time
         filetime = @int.to_i
-        secs = filetime / 10_000
-        nsecs = (filetime % 10_000) * 100
         if filetime.zero?
           NO_TIME
         elsif filetime.positive?
-          Time.at(NO_TIME) + Rational("#{secs}.%09d" % nsecs)
+          Time.at(NO_TIME) + Rational("#{filetime}/#{ONE_SEC}")
         else
-          Time.at(Time.now.utc) + Rational("#{secs}.%09d" % nsecs)
+          Time.at(Time.now.utc) + Rational("#{filetime}/#{ONE_SEC}")
         end
       end
 
       def time2filetime
         # Time#to_f then #to_r is more precise than Time#to_r
         # (ie Time#to_r sometimes does a rounding error).
-        (@time.to_i - NO_TIME.to_i) * 10_000 + ((@time.to_f.to_r * 10_000) % 10_000).to_i
+        (@time.to_i - NO_TIME.to_i) * ONE_SEC + ((@time.to_f.to_r * ONE_SEC) % ONE_SEC).to_i
       end
     end
   end
