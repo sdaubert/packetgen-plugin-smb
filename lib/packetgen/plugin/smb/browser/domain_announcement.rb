@@ -27,7 +27,7 @@ module PacketGen::Plugin
         end
       end
       PacketGen::Header.add_class DomainAnnouncement
-      SMB::TransRequest.bind DomainAnnouncement, name: '\\MAILSLOT\\BROWSE', body: ->(v) { v[0] == OPCODES['DomainAnnouncement'] }
+      SMB::Trans::Request.bind DomainAnnouncement, name: '\\MAILSLOT\\BROWSE', body: ->(v) { v[0] == OPCODES['DomainAnnouncement'] }
     end
   end
 end

@@ -22,7 +22,7 @@ module PacketGen::Plugin
         end
       end
       PacketGen::Header.add_class LocalMasterAnnouncement
-      SMB::TransRequest.bind LocalMasterAnnouncement, name: '\\MAILSLOT\\BROWSE', body: ->(v) { v[0] == OPCODES['LocalMasterAnnouncement'] }
+      SMB::Trans::Request.bind LocalMasterAnnouncement, name: '\\MAILSLOT\\BROWSE', body: ->(v) { v[0] == OPCODES['LocalMasterAnnouncement'] }
     end
   end
 end

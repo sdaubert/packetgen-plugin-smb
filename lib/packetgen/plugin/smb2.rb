@@ -136,8 +136,9 @@ module PacketGen::Plugin
     # @return [void]
     def self.bind_command(command)
       contantized = command.capitalize.gsub(/_(\w)/) { $1.upcase }
-      krequest = self.const_get("#{contantized}Request")
-      kresponse = self.const_get("#{contantized}Response")
+      krequest = self.const_get("#{contantized}::Request")
+      kresponse = self.const_get("#{contantized}::Response")
+      p krequest
       PacketGen::Header.add_class krequest
       self.bind krequest, command: SMB2::COMMANDS[command], flags: ->(v) { v.nil? ? 0 : (v & 1).zero? }
       PacketGen::Header.add_class kresponse

@@ -81,7 +81,7 @@ module PacketGen::Plugin
       end
     end
     PacketGen::Header.add_class Browser
-    SMB::TransRequest.bind Browser, name: '\\MAILSLOT\\BROWSE'
+    Trans::Request.bind Browser, name: '\\MAILSLOT\\BROWSE'
   end
 end
 

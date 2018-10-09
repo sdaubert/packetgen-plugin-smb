@@ -65,7 +65,7 @@ module PacketGen::Plugin
         end
       end
       PacketGen::Header.add_class HostAnnouncement
-      SMB::TransRequest.bind HostAnnouncement, name: '\\MAILSLOT\\BROWSE', body: ->(v) { v[0] == OPCODES['HostAnnouncement'] }
+      SMB::Trans::Request.bind HostAnnouncement, name: '\\MAILSLOT\\BROWSE', body: ->(v) { v[0] == OPCODES['HostAnnouncement'] }
     end
   end
 end
