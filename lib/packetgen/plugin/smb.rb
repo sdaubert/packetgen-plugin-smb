@@ -86,24 +86,24 @@ module PacketGen::Plugin
     # @!attribute body
     #  @return [String]
     define_field :body, PacketGen::Types::String
-    # @!attribute flags_reply
+    # @!attribute flags_reply?
     #  When set, the message is a reply from server to client.
     #  @return [Boolean]
-    # @!attribute flags_opbatch
+    # @!attribute flags_opbatch?
     #  Obsolescent.
     #  @return [Boolean]
-    # @!attribute flags_oplock
+    # @!attribute flags_oplock?
     #  Obsolescent.
     #  @return [Boolean]
-    # @!attribute flags_canon_paths
+    # @!attribute flags_canon_paths?
     #  Obsolescent.
     #  @return [Boolean]
-    # @!attribute flags_case_insensitive
+    # @!attribute flags_case_insensitive?
     #  Obsolete.
     #  @return [Boolean]
-    # @!attribute flags_reserved
+    # @!attribute flags_reserved?
     #  @return [Boolean]
-    # @!attribute flags_rbuf_avail
+    # @!attribute flags_rbuf_avail?
     #  Obsolete.
     #  @return [Boolean]
     # @!attribute flags_locknread
@@ -113,42 +113,42 @@ module PacketGen::Plugin
     define_bit_fields_on :flags, :flags_reply, :flags_opbatch, :flags_oplock,
                          :flags_canon_paths, :flags_case_insensitive,
                          :flags_reserved, :flags_buf_avail, :flags_locknread
-    # @!attribute flags2_unicode
+    # @!attribute flags2_unicode?
     #  If set, each field that contains a string in this message is encoded
     #  as UTF-16.
     #  @return [Boolean]
-    # @!attribute flags2_ntstatus
+    # @!attribute flags2_ntstatus?
     #  If set in a client request, server must return errors as NTSTATUS, else
     #  as SMBSTATUS.
     #  @return [Boolean]
-    # @!attribute flags2_paging_io
+    # @!attribute flags2_paging_io?
     #  Client may read a file if it does not have read permission but have
     #  execute one.
     #  @return [Boolean]
-    # @!attribute flags2_dfs
+    # @!attribute flags2_dfs?
     #  If set, any pathnames should be resolved in the Distributed File System
     #  (DFS).
     #  @return [Boolean]
-    # @!attribute flags2_extended_security
+    # @!attribute flags2_extended_security?
     #  @return [Boolean]
-    # @!attribute flags2_reparse_path
+    # @!attribute flags2_reparse_path?
     #  @return [Boolean]
     # @!attribute flags2_reserved
     #  3-bit reserved field
     #  @return [Integer]
-    # @!attribute flags2_is_long_name
+    # @!attribute flags2_is_long_name?
     #  @return [Boolean]
-    # @!attribute flags2_rsv
+    # @!attribute flags2_rsv?
     #  @return [Boolean]
-    # @!attribute flags2_security_signature_required
+    # @!attribute flags2_security_signature_required?
     #  @return [Boolean]
-    # @!attribute flags2_compressed
+    # @!attribute flags2_compressed?
     #  @return [Boolean]
-    # @!attribute flags2_signature
+    # @!attribute flags2_signature?
     #  @return [Boolean]
-    # @!attribute flags2_eas
+    # @!attribute flags2_eas?
     #  @return [Boolean]
-    # @!attribute flags2_long_names
+    # @!attribute flags2_long_names?
     #  If unset, file names must adhere to the 8.3 naming convention.
     #  @return [Boolean]
     define_bit_fields_on :flags2, :flags2_unicode, :flags2_ntstatus,

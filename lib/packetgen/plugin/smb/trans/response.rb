@@ -10,7 +10,7 @@ module PacketGen::Plugin
     module Trans
       # Transaction Response.
       #
-      # See also {Blocks}, as {TransResponse} is a specialization of {Blocks#words}
+      # See also {Blocks}, as {Response} is a specialization of {Blocks#words}
       # and {Blocks#bytes}.
       # @author Sylvain Daubert
       class Response < PacketGen::Header::Base
@@ -79,6 +79,8 @@ module PacketGen::Plugin
         #  @return [Integer]
         define_field :pad1, PacketGen::Types::String, default: "\0" * 4,
                      builder: ->(h, t) { t.new(length_from: -> { h.data_offset - SMB.new.sz - (h.offset_of(:byte_count) + h[:byte_count].sz) }) }
+        # @!attribute body
+        #  @return [String]
         define_field :body, PacketGen::Types::String
 
         # Give protocol name for this class

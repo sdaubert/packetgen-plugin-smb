@@ -119,9 +119,9 @@ module PacketGen::Plugin
         #  @return [String]
         define_smb2_pad_field :pad
         # @!attribute context_list
-        #  If {#dialects} contains he value 0x0311, then this field must contain an array
-        #  of {NegotiateContext}
-        #  @return [ArrayOfNegotiateContext]
+        #  If {#dialects} contains the value 0x0311, then this field must contain an array
+        #  of {Context}
+        #  @return [ArrayOfContext]
         define_field :context_list, ArrayOfContext, builder: ->(h, t) { t.new(counter: h[:context_count]) }
 
         # @return [String]

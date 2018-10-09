@@ -65,7 +65,7 @@ module PacketGen::Plugin
       class PreauthIntegrityCap < Context
       end
 
-      # Array of {NegotiateContext}
+      # Array of {Context}
       # @author Sylvain Daubert
       class ArrayOfContext < PacketGen::Types::Array
         set_of Context

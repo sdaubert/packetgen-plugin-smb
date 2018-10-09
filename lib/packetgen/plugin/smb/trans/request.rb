@@ -10,7 +10,7 @@ module PacketGen::Plugin
     module Trans
       # Transaction Request.
       #
-      # See also {Blocks}, as {TransRequest} is a specialization of {Blocks#words}
+      # See also {Blocks}, as {Trans::Request} is a specialization of {Blocks#words}
       # and {Blocks#bytes}.
       # @author Sylvain Daubert
       class Request < PacketGen::Header::Base
@@ -106,6 +106,8 @@ module PacketGen::Plugin
         #  @return [String]
         define_field :pad1, PacketGen::Types::String, default: "\0" * 4,
                      builder: ->(h, t) { t.new(length_from: -> { h.data_offset - SMB.new.sz - (h.offset_of(:name) + h[:name].sz) }) }
+        # @!attribute body
+        #  @return [String]
         define_field :body, PacketGen::Types::String
 
         # Give protocol name for this class

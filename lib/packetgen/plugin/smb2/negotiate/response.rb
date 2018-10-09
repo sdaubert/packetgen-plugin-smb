@@ -139,8 +139,6 @@ module PacketGen::Plugin
         #  @return [Integer]
         define_field :context_offset, PacketGen::Types::Int32le
         # @!attribute buffer
-        #  Optional padding between the end of the {#dialects} array and the first negotiate
-        #  context in {#context_ist} so that the first negotiate context is 8-byte aligned.
         #  @return [String]
         define_field :buffer, PacketGen::Types::String, builder: ->(h, t) { t.new(length_from: h[:buffer_length]) }
         # @!attribute pad
@@ -149,9 +147,9 @@ module PacketGen::Plugin
         #  @return [String]
         define_smb2_pad_field :pad
         # @!attribute context_list
-        #  If {#dialects} contains he value 0x0311, then this field must contain an array
-        #  of {NegotiateContext}
-        #  @return [ArrayOfNegotiateContext]
+        #  If {#dialect} has the value 0x0311, then this field must contain an array
+        #  of {Context}
+        #  @return [ArrayOfContext]
         define_field :context_list, ArrayOfContext, builder: ->(h, t) { t.new(counter: h[:context_count]) }
 
         # @return [String]

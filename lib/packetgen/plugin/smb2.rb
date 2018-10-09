@@ -102,10 +102,10 @@ module PacketGen::Plugin
     # @!attribute flags_rsv1
     #  2-bit reserved field
     #  @return [Integer]
-    # @!attribute flags_smb3_replay_op
+    # @!attribute flags_smb3_replay_op?
     #  When set, the command is a replay operation (only SMB 3 dialect).
     #  @return [Boolean]
-    # @!attribute flags_dsf_op
+    # @!attribute flags_dsf_op?
     #  When set, the command is a Distributed File System (DFS) operation..
     #  @return [Boolean]
     # @!attribute flags_rsv2
@@ -114,16 +114,16 @@ module PacketGen::Plugin
     # @!attribute flags_smb3_priority
     #  3-bit value of I/O priority (only SMB 3 dialect).
     #  @return [Integer]
-    # @!attribute flags_signed
+    # @!attribute flags_signed?
     #  When set, the message is signed.
     #  @return [Boolean]
-    # @!attribute flags_related_op
+    # @!attribute flags_related_op?
     #  When set, the message is a related operation in a compounded chain.
     #  @return [Boolean]
-    # @!attribute flags_async
+    # @!attribute flags_async?
     #  When set, the message is a asynchronous.
     #  @return [Boolean]
-    # @!attribute flags_response
+    # @!attribute flags_response?
     #  When set, the message is a response from server to client.
     #  @return [Boolean]
     define_bit_fields_on :flags, :flags_rsv1, 2, :flags_smb3_replay_op, :flags_dfs_op,

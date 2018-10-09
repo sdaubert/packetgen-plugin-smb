@@ -10,10 +10,10 @@ module PacketGen::Plugin
     # SMB strings (UTF-16 little-endian).
     # @author Sylvain Daubert
     class String < PacketGen::Types::CString
-      # @param [Boolean] unicode
+      # @param [Boolean] value
+      # @return [Boolean]
       attr_writer :unicode
 
-      # @param [Boolean, Proc] is string UTF-16 encoded?
       # @param [Hash] options
       # @option options [Integer] :static_length set a static length for this string
       # @option options [Boolean] :unicode If +true+, string is encoded as a UTF-16
