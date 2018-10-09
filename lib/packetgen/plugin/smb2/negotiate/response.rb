@@ -152,7 +152,7 @@ module PacketGen::Plugin
         #  If {#dialects} contains he value 0x0311, then this field must contain an array
         #  of {NegotiateContext}
         #  @return [ArrayOfNegotiateContext]
-        define_field :context_list, ArrayOfContext
+        define_field :context_list, ArrayOfContext, builder: ->(h, t) { t.new(counter: h[:context_count]) }
 
         # @return [String]
         def inspect
