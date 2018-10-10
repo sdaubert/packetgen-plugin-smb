@@ -32,12 +32,26 @@ module PacketGen::Plugin
         expect(nego.context_list.size).to eq(2)
 
         context = nego.context_list[0]
+        expect(context).to be_a(Negotiate::PreauthIntegrityCap)
         expect(context.human_type).to eq('PREAUTH_INTEGRITY_CAP')
         expect(context.data_length).to eq(38)
+        expect(context.reserved).to eq(0)
+        expect(context.hash_alg_count).to eq(1)
+        expect(context.salt_length).to eq(32)
+        expect(context.hash_alg.size).to eq(1)
+        expect(context.hash_alg.map(&:to_i)).to eq([1])
+        expect(context.salt[0, 4]).to eq(force_binary("\xd5\xec\x0d\x5e"))
+        expect(context.pad.size).to eq(2)
 
         context = nego.context_list[1]
+        expect(context).to be_a(Negotiate::EncryptionCap)
         expect(context.human_type).to eq('ENCRYPTION_CAP')
         expect(context.data_length).to eq(6)
+        expect(context.reserved).to eq(0)
+        expect(context.cipher_count).to eq(2)
+        expect(context.ciphers.size).to eq(2)
+        expect(context.ciphers.map(&:to_i)).to eq([1, 2])
+        expect(context.pad.size).to eq(0)
       end
     end
 

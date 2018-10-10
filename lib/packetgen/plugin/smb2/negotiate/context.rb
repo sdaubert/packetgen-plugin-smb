@@ -26,7 +26,7 @@ module PacketGen::Plugin
         TYPES = {
           'PREAUTH_INTEGRITY_CAP' => 1,
           'ENCRYPTION_CAP' => 2
-        }
+        }.freeze
 
         # @!attribute type
         #  16-bit context type
@@ -49,6 +49,29 @@ module PacketGen::Plugin
         #  @return [String]
         define_field :pad, PacketGen::Types::String, builder: ->(h, t) { t.new(length_from: -> { v = 8 - (h.offset_of(:data) + h.data_length) % 8; v == 8 ? 0 : v }) }
 
+        # @private
+        alias old_read read
+
+        # Populate object from a binary string
+        # @param [String] str
+        # @return [Context]
+        def read(str)
+          return self if str.nil?
+          if self.instance_of? Context
+            self[:type].read str[0, 2]
+            name = TYPES.key(type)
+            return old_read(str) if name.nil?
+
+            klassname = name.downcase.capitalize.gsub(/_(\w)/) { $1.upcase }
+            return old_read(str) unless Negotiate.const_defined? klassname
+
+            klass = Negotiate.const_get(klassname)
+            klass.new.read str
+          else
+            old_read str
+          end
+        end
+
         # Get human-readable type
         # @return [String]
         def human_type
@@ -63,6 +86,39 @@ module PacketGen::Plugin
       end
 
       class PreauthIntegrityCap < Context
+        remove_field :data
+        # @!attribute hash_alg_count
+        #  16-bit number of hash algorithm in {#hash_alg}
+        #  @return [Integer]
+        define_field_before :pad, :hash_alg_count, PacketGen::Types::Int16le
+        # @!attribute salt_length
+        #  16-bit length of {#salt} field, in bytes.
+        #  @return [Integer]
+        define_field_before :pad, :salt_length, PacketGen::Types::Int16le
+        # @!attribute hash_alg
+        #  Array of 16-bit integer IDs specifying the supported preauthentication
+        #  hash algorithms
+        #  @return [PacketGen::Types::ArrayOfInt16le]
+        define_field_before :pad, :hash_alg, PacketGen::Types::ArrayOfInt16le, builder: ->(h, t) { t.new(counter: h[:hash_alg_count]) }
+        # @!attribute salt
+        #  Salt value for hash
+        #  @return [String]
+        define_field_before :pad, :salt, PacketGen::Types::String, builder: ->(h, t) { t.new(length_from: h[:salt_length]) }
+        update_field :pad, builder: ->(h, t) { t.new(length_from: -> { v = 8 - (h.offset_of(:salt) + h.salt_length) % 8; v == 8 ? 0 : v }) }
+      end
+
+      class EncryptionCap < Context
+        remove_field :data
+        # @!attribute cipher_count
+        #  16-bit number of cipher algorithm in {#ciphers}
+        #  @return [Integer]
+        define_field_before :pad, :cipher_count, PacketGen::Types::Int16le
+        # @!attribute ciphers
+        #  Array of 16-bit integer IDs specifying the supported encryption
+        #  algorithms
+        #  @return [PacketGen::Types::ArrayOfInt16le]
+        define_field_before :pad, :ciphers, PacketGen::Types::ArrayOfInt16le, builder: ->(h, t) { t.new(counter: h[:hash_alg_count]) }
+        update_field :pad, builder: ->(h, t) { t.new(length_from: -> { v = 8 - (h.offset_of(:cipher_count) + h[:cipher_count].sz) % 8; v == 8 ? 0 : v }) }
       end
 
       # Array of {Context}
