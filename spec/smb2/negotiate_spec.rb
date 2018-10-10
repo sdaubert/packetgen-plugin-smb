@@ -4,15 +4,15 @@ module PacketGen::Plugin
   class SMB2
     pkts = read_packets('smb2.pcapng')
 
-    describe NegotiateRequest do
+    describe Negotiate::Request do
       it 'parses a SMB2 Neogiate request packet' do
         pkt = pkts[2]
         expect(pkt.is?('SMB2')).to be(true)
         expect(pkt.smb2.command).to eq(0)
         expect(pkt.smb2[:command].to_human).to eq('negotiate')
         expect(pkt.smb2.flags_response?).to be(false)
-        expect(pkt.is?('SMB2::NegotiateRequest')).to be(true)
-        nego = pkt.smb2_negotiaterequest
+        expect(pkt.is?('SMB2::Negotiate::Request')).to be(true)
+        nego = pkt.smb2_negotiate_request
         expect(nego.structure_size).to eq(36)
         expect(nego.dialect_count).to eq(8)
         expect(nego.security_mode).to eq(1)
@@ -34,22 +34,24 @@ module PacketGen::Plugin
         context = nego.context_list[0]
         expect(context.human_type).to eq('PREAUTH_INTEGRITY_CAP')
         expect(context.data_length).to eq(38)
+        p context
 
         context = nego.context_list[1]
         expect(context.human_type).to eq('ENCRYPTION_CAP')
         expect(context.data_length).to eq(6)
+        p context
       end
     end
 
-    describe NegotiateResponse do
+    describe Negotiate::Response do
       it 'parses a SMB2 Neogiate response packet' do
         pkt = pkts[3]
         expect(pkt.is?('SMB2')).to be(true)
         expect(pkt.smb2.command).to eq(0)
         expect(pkt.smb2[:command].to_human).to eq('negotiate')
         expect(pkt.smb2.flags_response?).to be(true)
-        expect(pkt.is?('SMB2::NegotiateResponse')).to be(true)
-        nego = pkt.smb2_negotiateresponse
+        expect(pkt.is?('SMB2::Negotiate::Response')).to be(true)
+        nego = pkt.smb2_negotiate_response
         expect(nego.structure_size).to eq(65)
         expect(nego.security_mode).to eq(1)
         expect(nego.dialect).to eq(0x311)
