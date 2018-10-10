@@ -153,6 +153,13 @@ module PacketGen::Plugin
           str
         end
 
+        # Calculate and set {#context_offset} field. Also calculate
+        # lengths in {Context contexts}.
+        # @return [Integer]
+        def calc_length
+          self.context_offset = SMB2.new.sz + offset_of(:context_list)
+        end
+
         # Protocol name
         # @return [String]
         def protocol_name

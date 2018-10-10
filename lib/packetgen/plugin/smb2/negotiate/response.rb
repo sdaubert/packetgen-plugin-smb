@@ -175,6 +175,16 @@ module PacketGen::Plugin
           str
         end
 
+        # Calculate and set {#context_offset}, {#buffer_offset} and {#buffer_length} fields.
+        # Also calculate lengths in {Context contexts}.
+        # @return [void]
+        def calc_length
+          self.context_offset = SMB2.new.sz + offset_of(:context_list)
+          self.buffer_offset = SMB2.new.sz + offset_of(:buffer)
+          self.buffer_length = buffer.sz
+          context_list.each { |ctx| ctx.calc_length if ctx.respond_to? :calc_length }
+        end
+
         # Protocol name
         # @return [String]
         def protocol_name
