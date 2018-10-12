@@ -34,12 +34,10 @@ module PacketGen::Plugin
         context = nego.context_list[0]
         expect(context.human_type).to eq('PREAUTH_INTEGRITY_CAP')
         expect(context.data_length).to eq(38)
-        p context
 
         context = nego.context_list[1]
         expect(context.human_type).to eq('ENCRYPTION_CAP')
         expect(context.data_length).to eq(6)
-        p context
       end
     end
 
@@ -73,7 +71,7 @@ module PacketGen::Plugin
         expect(nego.buffer_offset).to eq(0x80)
         expect(nego.buffer_length).to eq(320)
         expect(nego.context_offset).to eq(0x1c0)
-        expect(nego.buffer.size).to eq(320)
+        expect(nego.buffer.sz).to eq(320)
         expect(nego.pad.size).to eq(0)
         expect(nego.context_list.size).to eq(2)
 

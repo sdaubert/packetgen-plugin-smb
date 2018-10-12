@@ -7,5 +7,6 @@
 
 require 'packetgen'
 require_relative 'packetgen/plugin/smb_version'
+require_relative 'packetgen/plugin/gssapi'
 require_relative 'packetgen/plugin/smb'
 require_relative 'packetgen/plugin/smb2'
