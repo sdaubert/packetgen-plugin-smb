@@ -146,27 +146,20 @@ module PacketGen::Plugin
 
     # @return [String]
     def inspect
-      str = PacketGen::Inspect.dashed_line(self.class, 1)
-      fields.each do |attr|
-        next if attr == :body
+      super do |attr|
+        next unless attr == :flags
 
-        case attr
-        when :flags
-          value = bits_on(attr).reject { |_, v| v > 1 }
-                               .keys
-                               .select { |b| send("#{b}?") }
-                               .map(&:to_s)
-                               .join(',')
-                               .gsub!(/#{attr}_/, '')
-          value = '%-16s (0x%02x)' % [value, self[attr].to_i]
-          str << PacketGen::Inspect.shift_level(1)
-          str << PacketGen::Inspect::FMT_ATTR % [self[attr].class.to_s.sub(/.*::/, ''),
-                                                 attr, value]
-        else
-          str << PacketGen::Inspect.inspect_attribute(attr, self[attr], 1)
-        end
+        value = bits_on(attr).reject { |_, v| v > 1 }
+                             .keys
+                             .select { |b| send("#{b}?") }
+                             .map(&:to_s)
+                             .join(',')
+                             .gsub!(/#{attr}_/, '')
+        value = '%-16s (0x%02x)' % [value, self[attr].to_i]
+        str = PacketGen::Inspect.shift_level
+        str << PacketGen::Inspect::FMT_ATTR % [self[attr].class.to_s.sub(/.*::/, ''),
+                                               attr, value]
       end
-      str
     end
   end
   # TODO: move this in netbios file when packetgen3 will be out

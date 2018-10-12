@@ -154,25 +154,19 @@ module PacketGen::Plugin
 
         # @return [String]
         def inspect
-          str = PacketGen::Inspect.dashed_line(self.class, 1)
-          fields.each do |attr|
-            case attr
-            when :capabilities
-              value = bits_on(attr).reject { |_, v| v > 1 }
-                                   .keys
-                                   .select { |b| send("#{b}?") }
-                                   .map(&:to_s)
-                                   .join(',')
-                                   .gsub!(/cap_/, '')
-              value = '%-16s (0x%08x)' % [value, self[attr].to_i]
-              str << PacketGen::Inspect.shift_level(1)
-              str << PacketGen::Inspect::FMT_ATTR % [self[attr].class.to_s.sub(/.*::/, ''),
-                                                     attr, value]
-            else
-              str << PacketGen::Inspect.inspect_attribute(attr, self[attr], 1)
-            end
+          super do |attr|
+            next unless attr == :capabilities
+            value = bits_on(attr).reject { |_, v| v > 1 }
+                                 .keys
+                                 .select { |b| send("#{b}?") }
+                                 .map(&:to_s)
+                                 .join(',')
+                                 .gsub!(/cap_/, '')
+            value = '%-16s (0x%08x)' % [value, self[attr].to_i]
+            str = PacketGen::Inspect.shift_level
+            str << PacketGen::Inspect::FMT_ATTR % [self[attr].class.to_s.sub(/.*::/, ''),
+                                                   attr, value]
           end
-          str
         end
 
         # Calculate and set {#context_offset}, {#buffer_offset} and {#buffer_length} fields.

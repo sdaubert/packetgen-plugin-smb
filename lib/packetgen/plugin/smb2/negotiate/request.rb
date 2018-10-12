@@ -126,8 +126,7 @@ module PacketGen::Plugin
 
         # @return [String]
         def inspect
-          str = PacketGen::Inspect.dashed_line(self.class, 1)
-          fields.each do |attr|
+          super do |attr|
             case attr
             when :capabilities
               value = bits_on(attr).reject { |_, v| v > 1 }
@@ -137,20 +136,16 @@ module PacketGen::Plugin
                                    .join(',')
                                    .gsub!(/cap_/, '')
               value = '%-16s (0x%08x)' % [value, self[attr].to_i]
-              str << PacketGen::Inspect.shift_level(1)
+              str = PacketGen::Inspect.shift_level
               str << PacketGen::Inspect::FMT_ATTR % [self[attr].class.to_s.sub(/.*::/, ''),
                                                      attr, value]
             when :dialects
               list = self.dialects.map { |v| "%#04x" % v.to_i }.join(',')
-              str << PacketGen::Inspect.shift_level(1)
+              str = PacketGen::Inspect.shift_level
               str << PacketGen::Inspect::FMT_ATTR % [self[attr].class.to_s.sub(/.*::/, ''),
                                                      attr, list]
-
-            else
-              str << PacketGen::Inspect.inspect_attribute(attr, self[attr], 1)
             end
           end
-          str
         end
 
         # Calculate and set {#context_offset} field. Also calculate
