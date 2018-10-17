@@ -176,5 +176,6 @@ module PacketGen::Plugin
 end
 
 require_relative 'smb2/base'
-require_relative 'smb2/error'
 require_relative 'smb2/negotiate'
+require_relative 'smb2/session_setup'
+require_relative 'smb2/error'
