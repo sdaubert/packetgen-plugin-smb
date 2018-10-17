@@ -8,23 +8,49 @@
 require 'rasn1'
 
 module PacketGen::Plugin
-  # GSS API
+  # GSS API, from RFC 4178
   #
-  # A GSSAPI object is a ASN.1 SEQUENCE containing 2 elements:
-  # * an OBJECT ID named +oid+, which value should be +1.3.6.1.5.5.2+
-  # * a {NegTokenInit} object named +token+.
+  #    GSSAPI ::= CHOICE {
+  #       init        InitialContextToken,
+  #       token_resp  NegTokenResp
+  #    }
   #
+  #    InitialContextToken ::= [APPLICATION 0] IMPLICIT SEQUENCE {
+  #       oid         OBJECT IDENTIFIER,
+  #       token_init  NegTokenInit
+  #    }
+  #
+  #    NegTokenInit ::= [0] EXPLICIT SEQUENCE {
+  #       mechTypes       [0] MechTypeList,
+  #       reqFlags        [1] BIT STRING    OPTIONAL, -- No more used
+  #       mechToken       [2] OCTET STRING  OPTIONAL,
+  #       mechListMIC     [3] OCTET STRING  OPTIONAL,
+  #    }
+  #
+  #    NegTokenResp ::= [1] EXPLICIT SEQUENCE {
+  #       negState       [0] ENUMERATED {
+  #         accept-completed    (0),
+  #         accept-incomplete   (1),
+  #         reject              (2),
+  #         request-mic         (3)
+  #       }                                 OPTIONAL,
+  #       supportedMech   [1] MechType      OPTIONAL,
+  #       responseToken   [2] OCTET STRING  OPTIONAL,
+  #       mechListMIC     [3] OCTET STRING  OPTIONAL,
+  #    }
   # == Examples
-  #   # Access to oid
+  #   # Inital context
+  #   gssapi.chosen = 0
+  #   # Access to oid of initial context
   #   gssapi[:oid]        #=> RASN1::Types::ObjectId
   #   gssapi[:oid].value  #=> "1.3.6.1.5.5.2"
-  #   # Access to token
-  #   gssapi[:token]                #=> PacketGen::Plugin::GSSAPI::NegTokenInit
-  #   gssapi[:token][:mech_types]   #=> RASN1::Types::SequenceOf
+  #   # Access to token_init
+  #   gssapi[:token_init]                #=> PacketGen::Plugin::GSSAPI::NegTokenInit
+  #   gssapi[:token_init][:mech_types]   #=> RASN1::Types::SequenceOf
   #   # Get mech_types as an array of OID strings
-  #   gssapi[:token][:mech_types].value.map(&:value)
+  #   gssapi[:token_init][:mech_types].value.map(&:value)
   #   # Get mech_token value
-  #   gssapi[:token][:mech_token].value
+  #   gssapi[:token_init][:mech_token].value
   # @author Sylvain Daubert
   class GSSAPI < RASN1::Model
     # GSS API Negotiation Token Init
@@ -44,10 +70,36 @@ module PacketGen::Plugin
                          octet_string(:mech_list_mic, explicit: 3, class: :context, constructed: true, optional: true)]
     end
 
-    sequence :gssapi, implicit: 0, class: :application,
-             content: [objectid(:oid, value: '1.3.6.1.5.5.2'),
-                       model(:token, NegTokenInit)]
+    # GSS API Negotiation Token Response
+    class NegTokenResp < RASN1::Model
+      # Negotiation states
+      NEG_STATES = {
+        'accept-completed' => 0,
+        'accept-incomplete' => 1,
+        'reject' => 2,
+        'request-mic' => 3
+      }
+      sequence :token, explicit: 1, class: :context, constructed: true,
+               content: [enumerated(:negstate, enum: NEG_STATES, explicit: 0, class: :context, constructed: true, optional: true),
+                         objectid(:supported_mech, explicit: 1, class: :context, constructed: true, optional: true),
+                         octet_string(:response, explicit: 2, class: :context, constructed: true, optional: true),
+                         octet_string(:mech_list_mic, explicit: 3, class: :context, constructed: true, optional: true)]
+    end
 
+    choice :gssapi,
+           content: [sequence(:init, implicit: 0, class: :application,
+                              content: [objectid(:oid, value: '1.3.6.1.5.5.2'),
+                                        model(:token_init, NegTokenInit)]),
+                     model(:token_resp, NegTokenResp)]
+
+    # @param [Hash] args
+    # @param [Symbol] :type +:init+ or +:response+ to force selection of
+    #  token CHOICE.
+    def initialize(args={})
+      token = args.delete(:token)
+      super
+      self[:gssapi].chosen = (token == :init) ? 0 : 1
+    end
     # Populate Object from +str+
     # @param [String] str
     # @return [self]

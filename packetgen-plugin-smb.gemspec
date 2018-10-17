@@ -20,7 +20,7 @@ Gem::Specification.new do |spec|
   spec.required_ruby_version = '>= 2.3.0'
 
   spec.add_dependency 'packetgen', '~>2.8', '>= 2.8.6'
-  spec.add_dependency 'rasn1', '~>0.6', '>= 0.6.4'
+  spec.add_dependency 'rasn1', '~>0.6', '>= 0.6.5'
 
   spec.add_development_dependency 'bundler', '~> 1.16'
   spec.add_development_dependency 'rake', '~> 10.0'

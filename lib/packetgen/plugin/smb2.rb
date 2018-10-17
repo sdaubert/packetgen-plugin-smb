@@ -31,8 +31,12 @@ module PacketGen::Plugin
       'set_info' => 17,
       'oplock_break' => 18
     }.freeze
+
     # SMB marker, on start of header
     MARKER = PacketGen.force_binary("\xfeSMB").freeze
+
+    # SMB2 header size
+    HEADER_SIZE = 64
 
     # @!attribute protocol
     #  This field must contain {MARKER SMB2 marker}
@@ -41,7 +45,7 @@ module PacketGen::Plugin
     # @!attribute structure_size
     #  16-bit SMB2 header size. Should be 64.
     #  @return [Integer]
-    define_field :structure_size, PacketGen::Types::Int16le, default: 64
+    define_field :structure_size, PacketGen::Types::Int16le, default: HEADER_SIZE
     # @!attribute credit charge
     #  16-bit credit charge field. Must not be used and must be set to 0.
     #  @return [Integer]
