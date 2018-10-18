@@ -38,9 +38,9 @@ module PacketGen::Plugin
   #       responseToken   [2] OCTET STRING  OPTIONAL,
   #       mechListMIC     [3] OCTET STRING  OPTIONAL,
   #    }
-  # == Examples
-  #   # Inital context
-  #   gssapi.chosen = 0
+  #
+  # @example initial context
+  #   gssapi.chosen   #=> 0
   #   # Access to oid of initial context
   #   gssapi[:oid]        #=> RASN1::Types::ObjectId
   #   gssapi[:oid].value  #=> "1.3.6.1.5.5.2"
@@ -51,6 +51,14 @@ module PacketGen::Plugin
   #   gssapi[:token_init][:mech_types].value.map(&:value)
   #   # Get mech_token value
   #   gssapi[:token_init][:mech_token].value
+  #
+  # @example response token
+  #   gssapi.chosen   #=> 1
+  #   gssapi[:token_resp][:negstate]             #=> RASN1::Types::Enumerated
+  #   gssapi[:token_resp][:negstate].value       #=> String
+  #   gssapi[:token_resp][:supported_mech]       #=> RASN1::Types::ObjectId
+  #   gssapi[:token_resp][:supported_mech].value #=> String
+  #   gssapi[:token_resp][:response]             #=> RASN1::Types::OctetString
   # @author Sylvain Daubert
   class GSSAPI < RASN1::Model
     # GSS API Negotiation Token Init
