@@ -18,7 +18,6 @@ module PacketGen::Plugin
     end
 
     it 'parses a non-initial context blob' do
-      p pkts[5]
       gssapi = pkts[5].smb2_sessionsetup_response.buffer
       expect(gssapi).to be_a(GSSAPI)
       expect(gssapi.chosen).to eq(1)
