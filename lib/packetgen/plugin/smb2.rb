@@ -148,6 +148,12 @@ module PacketGen::Plugin
       self.bind kresponse, command: SMB2::COMMANDS[command], flags: ->(v) { v.nil? ? 0 : (v & 1 == 1) }
     end
 
+    # Invert {#flags_response?}
+    # @return [self]
+    def reply!
+      self.flags_response = !flags_response?
+    end
+
     # @return [String]
     def inspect
       super do |attr|
