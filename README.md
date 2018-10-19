@@ -3,7 +3,20 @@
 
 # Packetgen::Plugin::SMB
 
-This is a plugin for [PacketGen gem](https://github.com/sdaubert/packetgen). It adds some support for SMB protocol suite.
+This is a plugin for [PacketGen gem](https://github.com/sdaubert/packetgen). It adds some support for SMB protocol suite:
+
+* SMB:
+    * SMB common header,
+    * Close command,
+    * NtCreateAndX command,
+    * Trans command,
+    * Browser subprotocol,
+* SMB2:
+    * SMB2 common header (support 2.x and 3.x dialects),
+    * Negotiate command,
+    * SessionSetup command,
+* GSSAPI, used to transport negotiation over SMB2 commands.
+
 
 ## Installation
 
