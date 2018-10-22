@@ -38,6 +38,10 @@ Or install it yourself as:
 
 TODO
 
+## See also
+
+API documentation: http://www.rubydoc.info/gems/packetgen-plugin-smb
+
 ## License
 
 MIT License (see [LICENSE](https://github.com/sdaubert/packetgen-plugin-smb/blob/master/LICENSE))
