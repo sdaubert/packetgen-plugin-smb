@@ -32,7 +32,7 @@ module PacketGen::Plugin
         expect(pkt.smb_ntcreateandx_request.byte_count).to eq(19)
         expect(pkt.smb_ntcreateandx_request.pad1).to eq(0)
         expect(pkt.smb_ntcreateandx_request.filename).to eq('\\srvsvc'.encode('UTF-16LE'))
-        expect(pkt.smb_ntcreateandx_request.extra_bytes.sz).to eq(2)
+        expect(pkt.smb_ntcreateandx_request[:extra_bytes].sz).to eq(2)
       end
 
       describe '#calc_length' do
