@@ -47,30 +47,10 @@ module PacketGen::Plugin
         # @!attribute pad
         #  Padding to align next context on a 8-byte offset
         #  @return [String]
-        define_field :pad, PacketGen::Types::String, builder: ->(h, t) { t.new(length_from: -> { v = 8 - (h.offset_of(:data) + h.data_length) % 8; v == 8 ? 0 : v }) }
+        define_field :pad, PacketGen::Types::String, builder: ->(h, t) { t.new(length_from: -> { (8 - (h.offset_of(:data) + h.data_length) % 8) % 8 }) }
 
         # @private
         alias old_read read
-
-        # Populate object from a binary string
-        # @param [String] str
-        # @return [Context]
-        def read(str)
-          return self if str.nil?
-          if self.instance_of? Context
-            self[:type].read str[0, 2]
-            name = TYPES.key(type)
-            return old_read(str) if name.nil?
-
-            klassname = name.downcase.capitalize.gsub(/_(\w)/) { $1.upcase }
-            return old_read(str) unless Negotiate.const_defined? klassname
-
-            klass = Negotiate.const_get(klassname)
-            klass.new.read str
-          else
-            old_read str
-          end
-        end
 
         # Get human-readable type
         # @return [String]
@@ -104,7 +84,7 @@ module PacketGen::Plugin
         #  Salt value for hash
         #  @return [String]
         define_field_before :pad, :salt, PacketGen::Types::String, builder: ->(h, t) { t.new(length_from: h[:salt_length]) }
-        update_field :pad, builder: ->(h, t) { t.new(length_from: -> { v = 8 - (h.offset_of(:salt) + h.salt_length) % 8; v == 8 ? 0 : v }) }
+        update_field :pad, builder: ->(h, t) { t.new(length_from: -> { (8 - (h.offset_of(:salt) + h.salt_length) % 8) % 8 }) }
       end
 
       class EncryptionCap < Context
@@ -118,13 +98,21 @@ module PacketGen::Plugin
         #  algorithms
         #  @return [PacketGen::Types::ArrayOfInt16le]
         define_field_before :pad, :ciphers, PacketGen::Types::ArrayOfInt16le, builder: ->(h, t) { t.new(counter: h[:hash_alg_count]) }
-        update_field :pad, builder: ->(h, t) { t.new(length_from: -> { v = 8 - (h.offset_of(:cipher_count) + h[:cipher_count].sz) % 8; v == 8 ? 0 : v }) }
+        update_field :pad, builder: ->(h, t) { t.new(length_from: -> { (8 - (h.offset_of(:cipher_count) + h[:cipher_count].sz) % 8) % 8 }) }
       end
 
       # Array of {Context}
       # @author Sylvain Daubert
       class ArrayOfContext < PacketGen::Types::Array
         set_of Context
+
+        private
+
+        def real_type(ctx)
+          name = Context::TYPES.key(ctx.type)
+          klassname = name.downcase.capitalize.gsub(/_(\w)/) { $1.upcase }
+          Negotiate.const_defined?(klassname) ? Negotiate.const_get(klassname) : ctx.class
+        end
       end
     end
   end

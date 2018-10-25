@@ -162,6 +162,7 @@ module PacketGen::Plugin
         def inspect
           super do |attr|
             next unless attr == :capabilities
+
             value = bits_on(attr).reject { |_, v| v > 1 }
                                  .keys
                                  .select { |b| send("#{b}?") }
