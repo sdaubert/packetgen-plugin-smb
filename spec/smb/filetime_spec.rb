@@ -56,6 +56,20 @@ module PacketGen::Plugin
           expect(ft.to_human).to match(/^2018-09-15 15:33:27.000000000 (?:\+\d{4}|UTC)/)
         end
       end
+
+      describe '#from_human' do
+        let(:ft) { Filetime.new }
+
+        it 'sets time for a human readable time' do
+          ft.from_human('2018-09-15 15:33:27.0 UTC')
+          expect(ft.to_time).to eq(Time.utc(2018, 9, 15, 15, 33, 27))
+        end
+
+        it 'sets "no time"' do
+          ft.from_human('no time')
+          expect(ft.to_time).to eq(Filetime::NO_TIME)
+        end
+      end
     end
   end
 end

@@ -124,6 +124,12 @@ module PacketGen::Plugin
         #  @return [ArrayOfContext]
         define_field :context_list, ArrayOfContext, builder: ->(h, t) { t.new(counter: h[:context_count]) }
 
+        # Protocol name
+        # @return [String]
+        def self.protocol_name
+          'SMB2::Negotiate::Request'
+        end
+
         # @return [String]
         def inspect
           super do |attr|
@@ -153,12 +159,6 @@ module PacketGen::Plugin
         # @return [Integer]
         def calc_length
           self.context_offset = SMB2.new.sz + offset_of(:context_list)
-        end
-
-        # Protocol name
-        # @return [String]
-        def protocol_name
-          'SMB2::Negotiate::Request'
         end
       end
     end

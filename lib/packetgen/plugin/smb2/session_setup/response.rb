@@ -60,7 +60,7 @@ module PacketGen::Plugin
 
         # Protocol name
         # @return [String]
-        def protocol_name
+        def self.protocol_name
           'SMB2::SessionSetup::Response'
         end
       end

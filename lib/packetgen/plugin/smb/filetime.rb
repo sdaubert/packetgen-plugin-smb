@@ -17,6 +17,11 @@ module PacketGen::Plugin
       # Numbers of 100ns in one second
       ONE_SEC = 10_000_000
 
+      # String to format time
+      FORMAT_TIME_STR = '%Y-%m-%d %H:%M:%S.%9N %Z'
+      # String to parse time
+      PARSE_TIME_STR = '%Y-%m-%d %H:%M:%S.%N %Z'
+
       # @param [Hash] options
       # @option options [Integer] :filetime
       # @option options [Time] :time
@@ -49,8 +54,22 @@ module PacketGen::Plugin
         if no_time?
           'no time'
         else
-          @time.strftime("%Y-%m-%d %H:%M:%S.%9N %Z")
+          @time.strftime(FORMAT_TIME_STR)
         end
+      end
+
+      # @return [self]
+      def from_human(str)
+        return self if str.nil?
+
+        @time = if str == 'no time'
+                  Time.at(NO_TIME)
+                else
+                  DateTime.strptime(str, PARSE_TIME_STR).to_time
+                end
+        @int.value = time2filetime
+
+        self
       end
 
       # Get filetime integer value

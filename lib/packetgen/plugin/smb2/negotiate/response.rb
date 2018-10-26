@@ -152,10 +152,17 @@ module PacketGen::Plugin
         #  @return [ArrayOfContext]
         define_field :context_list, ArrayOfContext, builder: ->(h, t) { t.new(counter: h[:context_count]) }
 
+        # Protocol name
+        # @return [String]
+        def self.protocol_name
+          'SMB2::Negotiate::Response'
+        end
+
         # @return [String]
         def inspect
           super do |attr|
             next unless attr == :capabilities
+
             value = bits_on(attr).reject { |_, v| v > 1 }
                                  .keys
                                  .select { |b| send("#{b}?") }
@@ -177,12 +184,6 @@ module PacketGen::Plugin
           self.buffer_offset = SMB2.new.sz + offset_of(:buffer)
           self.buffer_length = buffer.sz
           context_list.each { |ctx| ctx.calc_length if ctx.respond_to? :calc_length }
-        end
-
-        # Protocol name
-        # @return [String]
-        def protocol_name
-          'SMB2::Negotiate::Response'
         end
       end
     end

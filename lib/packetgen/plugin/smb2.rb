@@ -172,13 +172,9 @@ module PacketGen::Plugin
       end
     end
   end
-  # TODO: move this in netbios file when packetgen3 will be out
-  PacketGen::Header::TCP.bind PacketGen::Header::NetBIOS::Session, dport: 445
-  PacketGen::Header::TCP.bind PacketGen::Header::NetBIOS::Session, sport: 445
 
   PacketGen::Header.add_class SMB2
-  PacketGen::Header::NetBIOS::Session.bind SMB2, body: ->(val) { val.nil? ? SMB2::MARKER : val[0..3] == SMB2::MARKER }
-  PacketGen::Header::NetBIOS::Datagram.bind SMB2, body: ->(val) { val.nil? ? SMB2::MARKER : val[0..3] == SMB2::MARKER }
+  NetBIOS::Session.bind SMB2, body: ->(val) { val.nil? ? SMB2::MARKER : val[0..3] == SMB2::MARKER }
 end
 
 require_relative 'smb2/base'

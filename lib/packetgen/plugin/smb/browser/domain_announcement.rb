@@ -20,11 +20,6 @@ module PacketGen::Plugin
         alias browser_conf_ver_min os_ver_min
         alias machine_group server_name
         alias local_master_name comment
-
-        # @return [String]
-        def protocol_name
-          'SMB::Browser::DomainAnnouncement'
-        end
       end
       PacketGen::Header.add_class DomainAnnouncement
       SMB::Trans::Request.bind DomainAnnouncement, name: '\\MAILSLOT\\BROWSE', body: ->(v) { v[0] == OPCODES['DomainAnnouncement'] }

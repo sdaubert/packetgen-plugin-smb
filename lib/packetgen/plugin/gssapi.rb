@@ -86,7 +86,7 @@ module PacketGen::Plugin
         'accept-incomplete' => 1,
         'reject' => 2,
         'request-mic' => 3
-      }
+      }.freeze
       sequence :token, explicit: 1, class: :context, constructed: true,
                content: [enumerated(:negstate, enum: NEG_STATES, explicit: 0, class: :context, constructed: true, optional: true),
                          objectid(:supported_mech, explicit: 1, class: :context, constructed: true, optional: true),
@@ -106,8 +106,9 @@ module PacketGen::Plugin
     def initialize(args={})
       token = args.delete(:token)
       super
-      self[:gssapi].chosen = (token == :init) ? 0 : 1
+      self[:gssapi].chosen = token == :init ? 0 : 1
     end
+
     # Populate Object from +str+
     # @param [String] str
     # @return [self]
