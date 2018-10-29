@@ -196,8 +196,13 @@ end
 
 require_relative 'smb/string'
 require_relative 'smb/filetime'
+require_relative 'smb/blocks'
 require_relative 'smb/close'
 require_relative 'smb/trans'
 require_relative 'smb/nt_create_and_x'
+require_relative 'smb/negotiate'
 require_relative 'smb/browser'
-require_relative 'smb/blocks'
+
+# If unknown command, bind SMB blocks
+PacketGen::Header.add_class PacketGen::Plugin::SMB::Blocks
+PacketGen::Plugin::SMB.bind PacketGen::Plugin::SMB::Blocks

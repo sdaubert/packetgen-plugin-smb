@@ -42,6 +42,4 @@ module PacketGen::Plugin
       end
     end
   end
-  PacketGen::Header.add_class SMB::Blocks
-  SMB.bind SMB::Blocks
 end
