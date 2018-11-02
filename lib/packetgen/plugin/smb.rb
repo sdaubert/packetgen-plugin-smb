@@ -171,6 +171,13 @@ module PacketGen::Plugin
       self.bind kresponse, command: SMB::COMMANDS[command], flags: ->(v) { v.nil? ? 0 : (v & 0x80 == 0x80) }
     end
 
+    # Check if this is really a SMB2 header. Check {#protocol} has value {MARKER}.
+    # @return [Boolean]
+    def parse?
+      protocol == MARKER
+    end
+
+    # @return [String]
     def inspect
       super do |attr|
         case attr

@@ -59,6 +59,7 @@ module PacketGen::Plugin
       def added_to_packet(packet)
         return unless packet.is? 'TCP'
         return unless packet.tcp.sport.zero?
+
         packet.tcp.sport = TCP_PORT
       end
     end
@@ -67,5 +68,5 @@ module PacketGen::Plugin
     PacketGen::Header::TCP.bind Session, sport: Session::TCP_PORT
     PacketGen::Header::TCP.bind Session, dport: Session::TCP_PORT2
     PacketGen::Header::TCP.bind Session, sport: Session::TCP_PORT2
-    end
+  end
 end

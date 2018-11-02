@@ -154,6 +154,12 @@ module PacketGen::Plugin
       self.flags_response = !flags_response?
     end
 
+    # Check if this is really a SMB2 header. Check {#protocol} has value {MARKER}.
+    # @return [Boolean]
+    def parse?
+      protocol == MARKER
+    end
+
     # @return [String]
     def inspect
       super do |attr|
