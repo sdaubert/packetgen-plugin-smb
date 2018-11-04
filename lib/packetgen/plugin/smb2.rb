@@ -145,7 +145,7 @@ module PacketGen::Plugin
       PacketGen::Header.add_class krequest
       self.bind krequest, command: SMB2::COMMANDS[command], flags: ->(v) { v.nil? ? 0 : (v & 1).zero? }
       PacketGen::Header.add_class kresponse
-      self.bind kresponse, command: SMB2::COMMANDS[command], flags: ->(v) { v.nil? ? 0 : (v & 1 == 1) }
+      self.bind kresponse, command: SMB2::COMMANDS[command], flags: ->(v) { v.nil? ? 1 : (v & 1 == 1) }
     end
 
     # Invert {#flags_response?}
