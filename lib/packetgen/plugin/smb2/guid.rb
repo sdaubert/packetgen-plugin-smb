@@ -52,7 +52,8 @@ module PacketGen::Plugin
       # @param [String] guid
       # @return [self]
       def from_human(guid)
-        return self
+        return self if guid.nil? || guid.empty?
+
         values = guid.split('-')
         return self if values.size != 5
 
