@@ -63,8 +63,15 @@ module PacketGen::Plugin
         def to_human
           human_type
         end
+
+        # Set {#data_length} field
+        # @return [Integer]
+        def calc_length
+          self.data_length = sz - 8
+        end
       end
 
+      # Specialized {Context} for PREAUTH_INTEGRITY_CAP type.
       class PreauthIntegrityCap < Context
         remove_field :data
         # @!attribute hash_alg_count
@@ -87,6 +94,7 @@ module PacketGen::Plugin
         update_field :pad, builder: ->(h, t) { t.new(length_from: -> { (8 - (h.offset_of(:salt) + h.salt_length) % 8) % 8 }) }
       end
 
+      # Specialized {Context} for ENCRYPTION_CAP type.
       class EncryptionCap < Context
         remove_field :data
         # @!attribute cipher_count
@@ -107,6 +115,15 @@ module PacketGen::Plugin
         set_of Context
 
         private
+
+        def record_from_hash(hsh)
+          obj_klass = self.class.set_of_klass
+          ctx = obj_klass.new(hsh)
+          klass = real_type(ctx)
+          return ctx if klass == obj_klass
+
+          klass.new(hsh)
+        end
 
         def real_type(ctx)
           name = Context::TYPES.key(ctx.type)
