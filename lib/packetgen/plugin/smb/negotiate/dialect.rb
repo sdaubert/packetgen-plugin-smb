@@ -15,6 +15,11 @@ module PacketGen::Plugin
         #  Null-terminated string identifying a SMB dialect.
         #  @return [String]
         define_field :dialect,PacketGen::Types::CString
+
+        # @return [String]
+        def to_human
+          self[:dialect].to_human
+        end
       end
 
       # Specialized {PacketGen::Types::Array} to embed {Dialect Dialects}.

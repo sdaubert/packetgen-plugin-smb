@@ -18,7 +18,7 @@ module PacketGen::Plugin
           expect(pkt_req.smb_negotiate_request.dialects.size).to eq(12)
           expect(pkt_req.smb_negotiate_request.dialects.map(&:format).uniq).to eq([2])
 
-          ary = pkt_req.smb_negotiate_request.dialects.map(&:dialect).map(&:to_str)
+          ary = pkt_req.smb_negotiate_request.dialects.map(&:to_human)
           ary.map! { |str| str.encode('UTF-8') }
           expect(ary).to eq(['PC NETWORK PROGRAM 1.0',
                              'MICROSOFT NETWORKS 1.03',
