@@ -96,5 +96,28 @@ module PacketGen::Plugin
         expect(pkt.smb2.signature).to eq(sig)
       end
     end
+
+    describe '#inspect' do
+      let(:smb2) { SMB2.new }
+
+      it 'puts a line for each attribute but body' do
+        str = smb2.inspect
+        (smb2.fields - %i[body async_id]).each do |field|
+          expect(str).to include(field.to_s)
+        end
+
+        smb2 = SMB2.new(flags_async: true)
+        str = smb2.inspect
+        (smb2.fields - %i[body reserved tree_id]).each do |field|
+          expect(str).to include(field.to_s)
+        end
+      end
+
+      it 'processes flags field as a set of flags' do
+        smb2.flags = 0xffff_ffff
+        str = smb2.inspect.split("\n").find { |l| l =~ /flags/ }
+        expect(str).to include('smb3_replay_op,dfs_op,signed,related_op,async,response')
+      end
+    end
   end
 end

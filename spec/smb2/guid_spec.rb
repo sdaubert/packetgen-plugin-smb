@@ -13,7 +13,6 @@ module PacketGen::Plugin
       it '#from_human' do
         guid = GUID.new
         guid.from_human('12345678-99aa-bbcc-1234-56789abcdef0')
-        p guid.to_human
         expect(guid.data1).to eq(0x1234_5678)
         expect(guid.data2).to eq(0x99aa)
         expect(guid.data3).to eq(0xbbcc)
