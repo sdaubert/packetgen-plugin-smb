@@ -116,19 +116,14 @@ module PacketGen::Plugin
 
         private
 
-        def record_from_hash(hsh)
-          obj_klass = self.class.set_of_klass
-          ctx = obj_klass.new(hsh)
-          klass = real_type(ctx)
-          return ctx if klass == obj_klass
-
-          klass.new(hsh)
-        end
-
         def real_type(ctx)
-          name = Context::TYPES.key(ctx.type)
+          name = Context::TYPES.key(ctx.type).to_s
           klassname = name.downcase.capitalize.gsub(/_(\w)/) { $1.upcase }
-          Negotiate.const_defined?(klassname) ? Negotiate.const_get(klassname) : ctx.class
+          if !klassname.empty? && Negotiate.const_defined?(klassname)
+            Negotiate.const_get(klassname)
+          else
+            ctx.class
+          end
         end
       end
     end

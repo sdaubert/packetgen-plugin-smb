@@ -143,7 +143,8 @@ module PacketGen::Plugin
         define_field :buffer, GSSAPI, token: :init
         # @!attribute pad
         #  Optional padding between the end of the {#buffer} field and the first negotiate
-        #  context in {#context_list} so that the first negotiate context is 8-byte aligned.
+        #  context in {#context_list} so that the first negotiate context is 8-byte aligned
+        # with start of SMB2 header.
         #  @return [String]
         define_smb2_pad_field :pad
         # @!attribute context_list

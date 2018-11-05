@@ -5,7 +5,7 @@ module PacketGen::Plugin
     pkts = read_packets('smb2.pcapng')
 
     describe Negotiate::Request do
-      it 'parses a SMB2 Neogiate request packet' do
+      it 'parses a SMB2 Negotiate request packet' do
         pkt = pkts[2]
         expect(pkt.is?('SMB2')).to be(true)
         expect(pkt.smb2.command).to eq(0)
@@ -56,7 +56,7 @@ module PacketGen::Plugin
     end
 
     describe Negotiate::Response do
-      it 'parses a SMB2 Neogiate response packet' do
+      it 'parses a SMB2 Negotiate response packet' do
         pkt = pkts[3]
         expect(pkt.is?('SMB2')).to be(true)
         expect(pkt.smb2.command).to eq(0)
@@ -96,6 +96,47 @@ module PacketGen::Plugin
         context = nego.context_list[1]
         expect(context.human_type).to eq('ENCRYPTION_CAP')
         expect(context.data_length).to eq(4)
+      end
+    end
+
+    describe Negotiate::Context do
+      it '#to_human returns human-readable type' do
+        ctx = Negotiate::Context.new(type: 2)
+        expect(ctx.to_human).to eq('ENCRYPTION_CAP')
+      end
+
+      it '#calc_length compute length of data part' do
+        ctx = Negotiate::Context.new
+        ctx[:data].replace 'abcd'
+        ctx.calc_length
+        expect(ctx.data_length).to eq(4)
+
+        ctx = Negotiate::PreauthIntegrityCap.new
+        ctx.hash_alg << PacketGen::Types::Int16le.new(1)
+        ctx.calc_length
+        expect(ctx.data_length).to eq(6)
+      end
+    end
+
+    describe Negotiate::ArrayOfContext do
+      let(:ary) { Negotiate::ArrayOfContext.new }
+
+      it '#<< accepts a hash describing a Context' do
+        ary << { type: 42, data_length: 4, data: 'abcd' }
+        expect(ary.first).to be_a(Negotiate::Context)
+        expect(ary.first.type).to eq(42)
+        expect(ary.first.data_length).to eq(4)
+        expect(ary.first.data).to eq('abcd')
+      end
+
+      it '#<< infers known Context subclasses from hash' do
+        ary << { type: 1, salt_length: 4, salt: 'abcd' }
+        expect(ary.last).to be_a(Negotiate::PreauthIntegrityCap)
+        expect(ary.last.salt_length).to eq(4)
+        expect(ary.last.salt).to eq('abcd')
+
+        ary << { type: 2 }
+        expect(ary.last).to be_a(Negotiate::EncryptionCap)
       end
     end
   end
