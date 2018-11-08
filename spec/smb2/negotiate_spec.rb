@@ -53,6 +53,37 @@ module PacketGen::Plugin
         expect(context.ciphers.map(&:to_i)).to eq([1, 2])
         expect(context.pad.size).to eq(0)
       end
+
+      describe '#calc_length' do
+        let(:nr) { Negotiate::Request.new }
+
+        it 'sets context_offset field' do
+          nr.calc_length
+          expect(nr.context_offset).to eq(0)
+
+          nr.context_list << { type: 2 }
+          nr.calc_length
+          expect(nr.context_offset).to eq(104)
+        end
+
+        it 'sets pad field' do
+          nr[:buffer] = PacketGen::Types::String.new
+          6.times do |i|
+            nr[:dialects] << PacketGen::Types::Int16le.new(i) unless i == 0
+            nr.calc_length
+            expect(nr.pad.size).to eq((4 - i * 2) % 8)
+          end
+        end
+
+        it 'sets length for each context' do
+          nr.context_list << { type: 1 }
+          nr.context_list << { type: 2 }
+          nr.calc_length
+
+          expect(nr.context_list[0].data_length).to eq(4)
+          expect(nr.context_list[1].data_length).to eq(2)
+        end
+      end
     end
 
     describe Negotiate::Response do

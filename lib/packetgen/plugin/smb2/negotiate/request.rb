@@ -154,11 +154,18 @@ module PacketGen::Plugin
           end
         end
 
-        # Calculate and set {#context_offset} field. Also calculate
-        # lengths in {Context contexts}.
+        # Calculate and set {#context_offset} and {#pad} fields.
+        # Also calculate lengths in {Context contexts}.
         # @return [Integer]
         def calc_length
-          self.context_offset = SMB2.new.sz + offset_of(:context_list)
+          self[:pad].read SMB2::MAX_PADDING
+
+          self.context_offset = 0
+          unless context_list.empty?
+            self.context_offset = SMB2.new.sz + offset_of(:context_list)
+          end
+
+          context_list.each { |ctx| ctx.calc_length if ctx.respond_to? :calc_length }
         end
       end
     end
