@@ -54,6 +54,23 @@ module PacketGen::Plugin
         expect(context.pad.size).to eq(0)
       end
 
+      describe '#inspect' do
+        let(:nr) { Negotiate::Request.new }
+        it 'handles capabilities field' do
+          nr.capabilities = 127
+          str = nr.inspect.split("\n").find { |l| l =~ /capabilities/ }
+          expect(str).to include('encryption,dir_leasing,persistent_handles,multi_channel,large_mtu,leasing,dfs')
+        end
+
+        it 'handles dialects field' do
+          inttype = PacketGen::Types::Int16le
+          nr.dialects << inttype.new(0x101)
+          nr.dialects << inttype.new(0x202)
+          str = nr.inspect.split("\n").find { |l| l =~ /dialects/ }
+          expect(str).to include('0x101,0x202')
+        end
+      end
+
       describe '#calc_length' do
         let(:nr) { Negotiate::Request.new }
 
@@ -130,7 +147,7 @@ module PacketGen::Plugin
       end
 
       describe '#inspect' do
-        it 'process capabilities differently' do
+        it 'handles capabilities field' do
           nr = Negotiate::Response.new
           nr.capabilities = 127
           str = nr.inspect.split("\n").find { |l| l =~ /capabilities/ }

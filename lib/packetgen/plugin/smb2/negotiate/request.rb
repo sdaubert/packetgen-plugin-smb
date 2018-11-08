@@ -146,7 +146,7 @@ module PacketGen::Plugin
               str << PacketGen::Inspect::FMT_ATTR % [self[attr].class.to_s.sub(/.*::/, ''),
                                                      attr, value]
             when :dialects
-              list = self.dialects.map { |v| "%#04x" % v.to_i }.join(',')
+              list = self.dialects.map { |v| "%#x" % v.to_i }.join(',')
               str = PacketGen::Inspect.shift_level
               str << PacketGen::Inspect::FMT_ATTR % [self[attr].class.to_s.sub(/.*::/, ''),
                                                      attr, list]
