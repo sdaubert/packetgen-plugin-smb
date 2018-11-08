@@ -38,6 +38,9 @@ module PacketGen::Plugin
     # SMB2 header size
     HEADER_SIZE = 64
 
+    # SMB2 pad field at its maximum length
+    MAX_PADDING = [0].pack('q').freeze
+
     # @!attribute protocol
     #  This field must contain {MARKER SMB2 marker}
     #  @return [String]

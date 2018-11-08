@@ -97,6 +97,58 @@ module PacketGen::Plugin
         expect(context.human_type).to eq('ENCRYPTION_CAP')
         expect(context.data_length).to eq(4)
       end
+
+      describe '#inspect' do
+        it 'process capabilities differently' do
+          nr = Negotiate::Response.new
+          nr.capabilities = 127
+          str = nr.inspect.split("\n").find { |l| l =~ /capabilities/ }
+          expect(str).to include('encryption,dir_leasing,persistent_handles,multi_channel,large_mtu,leasing,dfs')
+        end
+      end
+
+      describe '#calc_length' do
+        let(:nr) { Negotiate::Response.new }
+
+        it 'sets context_offset field' do
+          nr.calc_length
+          expect(nr.context_offset).to eq(0)
+
+          nr.context_list << { type: 2 }
+          nr.calc_length
+          expect(nr.context_offset).to eq(136)
+        end
+
+        it 'sets buffer_offset field' do
+          nr.calc_length
+          expect(nr.buffer_offset).to eq(128)
+        end
+
+        it 'sets buffer_length field' do
+          nr[:buffer] = PacketGen::Types::String.new
+          nr[:buffer].read 'abcdef'
+          nr.calc_length
+          expect(nr.buffer_length).to eq(6)
+        end
+
+        it 'sets pad field' do
+          nr[:buffer] = PacketGen::Types::String.new
+          12.times do |i|
+            nr[:buffer].read('a' * i)
+            nr.calc_length
+            expect(nr.pad.size).to eq((8 - i) % 8)
+          end
+        end
+
+        it 'sets length for each context' do
+          nr.context_list << { type: 1 }
+          nr.context_list << { type: 2 }
+          nr.calc_length
+
+          expect(nr.context_list[0].data_length).to eq(4)
+          expect(nr.context_list[1].data_length).to eq(2)
+        end
+      end
     end
 
     describe Negotiate::Context do
