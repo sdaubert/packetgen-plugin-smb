@@ -27,7 +27,7 @@ module PacketGen::Plugin
         expect(ssr.buffer.chosen).to eq(0)
       end
 
-      it 'parses a SMB2 Session Setup request packet #1' do
+      it 'parses a SMB2 Session Setup request packet #2' do
         pkt = pkts[6]
         expect(pkt.is?('SMB2')).to be(true)
         expect(pkt.smb2.command).to eq(1)
@@ -50,6 +50,25 @@ module PacketGen::Plugin
         expect(ssr.buffer[:token_resp][:mech_list_mic].to_der.size).to eq(20)
         expect(ssr.buffer[:token_resp][:mech_list_mic].value.size).to eq(16)
       end
+
+      describe '#calc_length' do
+        let(:req) do
+          rq = SessionSetup::Request.new
+          rq[:buffer] = PacketGen::Types::String.new
+          rq
+        end
+
+        it 'sets buffer length' do
+          req[:buffer].read 'abcd'
+          req.calc_length
+          expect(req.buffer_length).to eq(4)
+        end
+
+        it 'sets buffer offset' do
+          req.calc_length
+          expect(req.buffer_offset).to eq(0x58)
+        end
+      end
     end
 
     describe SessionSetup::Response do
@@ -69,6 +88,25 @@ module PacketGen::Plugin
         expect(ssr.buffer.sz).to eq(271)
         expect(ssr.buffer.chosen).to eq(1)
         expect(ssr.buffer[:token_resp][:negstate].value).to eq('accept-incomplete')
+      end
+
+      describe '#calc_length' do
+        let(:resp) do
+          rp = SessionSetup::Response.new
+          rp[:buffer] = PacketGen::Types::String.new
+          rp
+        end
+
+        it 'sets buffer length' do
+          resp[:buffer].read 'abcde'
+          resp.calc_length
+          expect(resp.buffer_length).to eq(5)
+        end
+
+        it 'sets buffer offset' do
+          resp.calc_length
+          expect(resp.buffer_offset).to eq(0x48)
+        end
       end
     end
   end

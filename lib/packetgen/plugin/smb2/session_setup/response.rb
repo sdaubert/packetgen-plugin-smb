@@ -52,10 +52,11 @@ module PacketGen::Plugin
         #  @return [GSSAPI]
         define_field :buffer, GSSAPI, token: :response
 
-        # Calculate and set {#buffer_length} field.
+        # Calculate and set {#buffer_length} and {#buffer_offset} fields.
         # @return [void]
         def calc_length
-          self.buffer_length = buffer.sz
+          self.buffer_offset = SMB2.new.sz + offset_of(:buffer)
+          self.buffer_length = self[:buffer].sz
         end
 
         # Protocol name
