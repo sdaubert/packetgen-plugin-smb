@@ -1,4 +1,4 @@
-lib = File.expand_path('../lib', __FILE__)
+lib = File.expand_path('lib', __dir__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'packetgen/plugin/smb_version'
 
@@ -8,8 +8,7 @@ Gem::Specification.new do |spec|
   spec.authors       = ['Sylvain Daubert']
   spec.email         = ['sylvain.daubert@laposte.net']
 
-  spec.summary       = %q{SMB plugin for packetgen.}
-  #spec.description   = %q{TODO: Write a longer description or delete this line.}
+  spec.summary       = 'SMB plugin for packetgen.'
   spec.homepage      = 'https://github.com/sdaubert/packetgen-plugin-smb'
 
   spec.files         = `git ls-files -z`.split("\x0").reject do |f|
@@ -20,7 +19,7 @@ Gem::Specification.new do |spec|
   spec.required_ruby_version = '>= 2.3.0'
 
   spec.add_dependency 'packetgen', '~>3.0', '>= 3.0.2'
-  spec.add_dependency 'rasn1', '~>0.6', '>= 0.6.7'
+  spec.add_dependency 'rasn1', '~>0.6', '>= 0.6.8'
 
   spec.add_development_dependency 'bundler', '~> 1.16'
   spec.add_development_dependency 'rake', '~> 10.0'

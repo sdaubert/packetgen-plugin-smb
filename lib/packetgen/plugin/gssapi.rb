@@ -75,7 +75,7 @@ module PacketGen::Plugin
                content: [sequence_of(:mech_types, RASN1::Types::ObjectId, explicit: 0, class: :context),
                          bit_string(:req_flags, explicit: 1, class: :context, constructed: true, optional: true),
                          octet_string(:mech_token, explicit: 2, class: :context, constructed: true, optional: true),
-                         octet_string(:mech_list_mic, explicit: 3, class: :context, constructed: true, optional: true)]
+                         any(:mech_list_mic, explicit: 3, class: :context, constructed: true, optional: true)]
     end
 
     # GSS API Negotiation Token Response
