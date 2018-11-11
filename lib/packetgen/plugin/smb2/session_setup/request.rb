@@ -79,7 +79,7 @@ module PacketGen::Plugin
         define_field :prev_session_id, PacketGen::Types::Int64le
         # @!attribute buffer
         #  @return [GSSAPI]
-        define_field :buffer, GSSAPI, token: :response
+        define_field :buffer, GSSAPI, token: :response, optional: ->(h) { h.buffer_offset > 0 }
 
         # Calculate and set {#buffer_length} and {#buffer_offset} fields.
         # @return [void]

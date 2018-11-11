@@ -140,7 +140,7 @@ module PacketGen::Plugin
         define_field :context_offset, PacketGen::Types::Int32le
         # @!attribute buffer
         #  @return [GSSAPI]
-        define_field :buffer, GSSAPI, token: :init
+        define_field :buffer, GSSAPI, token: :init, optional: ->(h) { h.buffer_offset > 0 }
         # @!attribute pad
         #  Optional padding between the end of the {#buffer} field and the first negotiate
         #  context in {#context_list} so that the first negotiate context is 8-byte aligned
