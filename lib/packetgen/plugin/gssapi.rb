@@ -122,5 +122,7 @@ module PacketGen::Plugin
     def sz
       to_der.size
     end
+
+    alias to_s to_der
   end
 end
