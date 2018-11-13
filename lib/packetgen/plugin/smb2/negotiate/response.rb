@@ -184,13 +184,13 @@ module PacketGen::Plugin
         def calc_length
           self[:pad].read SMB2::MAX_PADDING
 
+          self.buffer_offset = SMB2::HEADER_SIZE + offset_of(:buffer)
+          self.buffer_length = self[:buffer].sz
+
           self.context_offset = 0
           unless context_list.empty?
-            self.context_offset = SMB2.new.sz + offset_of(:context_list)
+            self.context_offset = SMB2::HEADER_SIZE + offset_of(:context_list)
           end
-
-          self.buffer_offset = SMB2.new.sz + offset_of(:buffer)
-          self.buffer_length = self[:buffer].sz
           context_list.each { |ctx| ctx.calc_length if ctx.respond_to? :calc_length }
         end
       end
