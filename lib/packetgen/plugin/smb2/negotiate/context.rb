@@ -67,7 +67,8 @@ module PacketGen::Plugin
         # Set {#data_length} field
         # @return [Integer]
         def calc_length
-          self.data_length = sz - 8
+          self[:pad].read SMB2::MAX_PADDING
+          self.data_length = sz - self[:pad].sz - 8
         end
       end
 
@@ -105,7 +106,7 @@ module PacketGen::Plugin
         #  Array of 16-bit integer IDs specifying the supported encryption
         #  algorithms
         #  @return [PacketGen::Types::ArrayOfInt16le]
-        define_field_before :pad, :ciphers, PacketGen::Types::ArrayOfInt16le, builder: ->(h, t) { t.new(counter: h[:hash_alg_count]) }
+        define_field_before :pad, :ciphers, PacketGen::Types::ArrayOfInt16le, builder: ->(h, t) { t.new(counter: h[:cipher_count]) }
         update_field :pad, builder: ->(h, t) { t.new(length_from: -> { (8 - (h.offset_of(:cipher_count) + h[:cipher_count].sz) % 8) % 8 }) }
       end
 
