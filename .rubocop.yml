@@ -8,6 +8,8 @@ Metrics:
   Enabled: false
 Style/AsciiComments:
   Enabled: false
+Style/ClassAndModuleChildren:
+  Enabled: false
 Style/Encoding:
   Enabled: false
 Style/EvalWithLocation:
