@@ -48,7 +48,7 @@ module PacketGen::Plugin
         SECURITY_MODES = {
           'signing_enabled' => 1,
           'signing required' => 2
-        }
+        }.freeze
 
         # @!attribute structure_size
         #  16-bit negotiate request structure size. Should be 36.
@@ -146,7 +146,7 @@ module PacketGen::Plugin
               str << PacketGen::Inspect::FMT_ATTR % [self[attr].class.to_s.sub(/.*::/, ''),
                                                      attr, value]
             when :dialects
-              list = self.dialects.map { |v| "%#x" % v.to_i }.join(',')
+              list = self.dialects.map { |v| '%#x' % v.to_i }.join(',')
               str = PacketGen::Inspect.shift_level
               str << PacketGen::Inspect::FMT_ATTR % [self[attr].class.to_s.sub(/.*::/, ''),
                                                      attr, list]
