@@ -101,7 +101,7 @@ module PacketGen::Plugin
                      model(:token_resp, NegTokenResp)]
 
     # @param [Hash] args
-    # @param [Symbol] :type +:init+ or +:response+ to force selection of
+    # @option args [Symbol] :token +:init+ or +:response+ to force selection of
     #  token CHOICE.
     def initialize(args={})
       token = args.delete(:token)

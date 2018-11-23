@@ -3,7 +3,7 @@ module PacketGen::Plugin
     module Negotiate
       # SMB Negotiation Response header.
       #
-      # See also {Blocks}, as {Negotiate::Rersponse} is a specialization of {Blocks#words}
+      # See also {Blocks}, as {Negotiate::Response} is a specialization of {Blocks#words}
       # and {Blocks#bytes}.
       # @author Sylvain Daubert
       class Response < Blocks
