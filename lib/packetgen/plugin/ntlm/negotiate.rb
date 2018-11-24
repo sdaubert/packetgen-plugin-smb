@@ -90,75 +90,38 @@ module PacketGen::Plugin
       define_negotiate_flags
       # @!endgroup Negotiate flags
 
+      # @!attribute domain_name
+      #  Name of the client authentication domain. Must be OEM encoded.
+      #  @return [String]
       # @!attribute domain_name_len
       #  2-byte domain name length
       #  @return [Integer]
-      define_field_before :payload, :domain_name_len, PacketGen::Types::Int16le
       # @!attribute domain_name_maxlen
       #  2-byte domain name max length
       #  @return [Integer]
-      define_field_before :payload, :domain_name_maxlen, PacketGen::Types::Int16le
       # @!attribute domain_name_offset
       #  4-byte domain name offset
       #  @return [Integer]
-      define_field_before :payload, :domain_name_offset, PacketGen::Types::Int32le
+      define_in_payload :domain_name, PacketGen::Types::String
+
+      # @!attribute workstation
+      #  Name of the client machine. Must be OEM encoded.
+      #  @return [String]
       # @!attribute workstation_len
       #  2-byte workstation length
       #  @return [Integer]
-      define_field_before :payload, :workstation_len, PacketGen::Types::Int16le
       # @!attribute workstation_maxlen
       #  2-byte workstation max length
       #  @return [Integer]
-      define_field_before :payload, :workstation_maxlen, PacketGen::Types::Int16le
       # @!attribute workstation_offset
       #  4-byte workstation offset
       #  @return [Integer]
-      define_field_before :payload, :workstation_offset, PacketGen::Types::Int32le
+      define_in_payload :workstation, PacketGen::Types::String
+
       # @!attribute version
       #  8-byte version information
       #  @return [String]
       define_field_before :payload, :version, PacketGen::Types::String, static_length: 8, default: VOID_VERSION
-
-      # Populate object from a binary string
-      # @param [String] str
-      # @return [self]
-      def read(str)
-        super
-
-        domain_offset_in_payload = domain_name_offset - offset_of(:payload)
-        self.domain_name = payload[domain_offset_in_payload, domain_name_len]
-
-        workstation_offset_in_payload = workstation_offset - offset_of(:payload)
-        self.workstation = payload[workstation_offset_in_payload, workstation_len]
-
-        self
-      end
-
-      # Calculate and set {#domain_name_offset}, {#domain_name_len},
-      # {#workstation_offset} and  {#workstation_len}.
-      # @return [void]
-      def calc_length
-        self.domain_name_len = 0
-        self.workstation_len = 0
-
-        self.domain_name_offset = offset_of(:payload)
-        if domain_name && !domain_name.empty?
-          self.domain_name_len = domain_name.size
-        end
-
-        self.workstation_offset = domain_name_offset + domain_name_len
-        if workstation && !workstation.empty?
-          self.workstation_len = workstation.size
-        end
-      end
-
-      # @return [String]
-      def to_s
-        s = super
-        s << domain_name unless domain_name.nil?
-        s << workstation unless workstation.nil?
-        s
-      end
     end
   end
 end
