@@ -166,4 +166,4 @@ end
 require_relative 'ntlm/av_pair'
 require_relative 'ntlm/negotiate'
 require_relative 'ntlm/challenge'
-#require_relative 'ntlm/authenticate'
+require_relative 'ntlm/authenticate'
