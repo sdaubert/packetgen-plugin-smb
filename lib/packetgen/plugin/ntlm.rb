@@ -116,8 +116,13 @@ module PacketGen::Plugin
       self.class.payload_fields.each do |name, type|
         offset_in_payload = send(:"#{name}_offset") - offset_of(:payload)
         length = send(:"#{name}_len")
-        content = type.new.read(payload[offset_in_payload, length])
-        send(:"#{name}=", content.to_human)
+        content = if type.respond_to?(:unicode?)
+                    type.new(unicode: unicode?)
+                  else
+                    type.new
+                  end
+        content.read(payload[offset_in_payload, length]) if length > 0
+        send(:"#{name}=", content)
       end
 
       self
@@ -151,13 +156,14 @@ module PacketGen::Plugin
       return s if self.class.payload_fields.nil?
 
       self.class.payload_fields.each do |name, _type|
-        s << send(name) unless send(name).nil?
+        s << send(name).to_s unless send(name).nil?
       end
       s
     end
   end
 end
 
+require_relative 'ntlm/av_pair'
 require_relative 'ntlm/negotiate'
-#require_relative 'ntlm/challenge'
+require_relative 'ntlm/challenge'
 #require_relative 'ntlm/authenticate'
