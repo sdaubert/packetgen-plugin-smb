@@ -13,14 +13,20 @@ module PacketGen::Plugin
       # @param [Boolean] value
       # @return [Boolean]
       attr_writer :unicode
+      # @param [Boolean] null_terminated
+      # @return [Boolean]
+      attr_writer :null_terminated
 
       # @param [Hash] options
       # @option options [Integer] :static_length set a static length for this string
       # @option options [Boolean] :unicode If +true+, string is encoded as a UTF-16
       #    unicode string. If +false+, string is encode in ASCII. Defaults to +true+.
+      # @option options [Boolean] :null_terminated If +true+, string is null-terminated.
+      #    If +false+, string is not null-terminated. Defaults to +true+.
       def initialize(options={})
         super
         @unicode = options.key?(:unicode) ? options[:unicode] : true
+        @null_terminated = options.key?(:null_terminated) ? options[:null_terminated] : true
         self.encode!('UTF-16LE') if @unicode
         self.encode!('ASCII-8BIT') unless @unicode
       end
@@ -28,6 +34,11 @@ module PacketGen::Plugin
       # @return [Boolean]
       def unicode?
         @unicode
+      end
+
+      # @return [Boolean]
+      def null_terminated?
+        @null_terminated
       end
 
       # @param [::String] str
@@ -55,6 +66,13 @@ module PacketGen::Plugin
         str2 = str2[0, idx] unless idx.nil?
         self.replace str2
         self
+      end
+
+      def to_s
+        s = super
+        return s if null_terminated?
+
+        s[0...-binary_terminator.size]
       end
 
       private
