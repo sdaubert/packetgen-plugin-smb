@@ -45,6 +45,20 @@ module PacketGen::Plugin
     class ArrayOfAvPair < PacketGen::Types::Array
       set_of AvPair
 
+      def read(str)
+        super
+
+        stop = each_with_index do |avpair, i|
+                 next unless avpair.type.zero?
+
+                 break i + 1
+               end
+        return self if stop.nil? || (stop >= size)
+
+        @array[stop..-1] = []
+        self
+      end
+
       private
 
       def real_type(obj)
