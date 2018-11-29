@@ -41,6 +41,18 @@ module PacketGen::Plugin
                                                            value_class: SMB::Filetime)
     TimestampAvPair.define_type_enum AVPAIR_TYPES
 
+    # Int32le AVPAIR structure, with value a {PacketGen::Types::Int32le}.
+    Int32leAvPair = PacketGen::Types::AbstractTLV.create(type_class: PacketGen::Types::Int16leEnum,
+                                                         length_class: PacketGen::Types::Int16le,
+                                                         value_class: PacketGen::Types::Int32le)
+    Int32leAvPair.define_type_enum AVPAIR_TYPES
+
+    # String AVPAIR structure, with value a {PacketGen::Types::String}.
+    StringAvPair = PacketGen::Types::AbstractTLV.create(type_class: PacketGen::Types::Int16leEnum,
+                                                        length_class: PacketGen::Types::Int16le,
+                                                        value_class: PacketGen::Types::String)
+    StringAvPair.define_type_enum AVPAIR_TYPES
+
     # Specialized array containing {AvPair AvPairs}.
     class ArrayOfAvPair < PacketGen::Types::Array
       set_of AvPair
@@ -65,6 +77,10 @@ module PacketGen::Plugin
         case obj.type
         when AVPAIR_TYPES['Timestamp']
           TimestampAvPair
+        when AVPAIR_TYPES['Flags']
+          Int32leAvPair
+        when AVPAIR_TYPES['SingleHost'], AVPAIR_TYPES['ChannelBindings']
+          StringAvPair
         else
           AvPair
         end

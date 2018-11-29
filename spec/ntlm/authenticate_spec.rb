@@ -42,7 +42,6 @@ module PacketGen::Plugin
           expect(auth.nt_response).to be_a(Ntlmv2Response)
 
           n2r = auth.nt_response
-          p n2r
           expect(n2r.type).to eq(1)
           expect(n2r.hi_type).to eq(1)
           expect(n2r.reserved1).to eq(0)
@@ -51,6 +50,8 @@ module PacketGen::Plugin
           expect(n2r.client_challenge).to eq([0x01505ee9, 0x6aa1b71d].pack('N*'))
           expect(n2r.reserved3).to eq(0)
           expect(n2r.avpairs.size).to eq(10)
+          names = n2r.avpairs.map { |pair| pair.human_type }
+          expect(names).to eq(%w[DomainName ComputerName DnsDomainName DnsComputerName Timestamp Flags SingleHost ChannelBindings TargetName EOL])
         end
 
         it 'sets domain_name' do
