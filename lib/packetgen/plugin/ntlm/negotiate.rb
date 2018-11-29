@@ -92,7 +92,7 @@ module PacketGen::Plugin
 
       # @!attribute domain_name
       #  Name of the client authentication domain. Must be OEM encoded.
-      #  @return [String]
+      #  @return [PacketGen::Types::String]
       # @!attribute domain_name_len
       #  2-byte domain name length
       #  @return [Integer]
@@ -106,7 +106,7 @@ module PacketGen::Plugin
 
       # @!attribute workstation
       #  Name of the client machine. Must be OEM encoded.
-      #  @return [String]
+      #  @return [PacketGen::Types::String]
       # @!attribute workstation_len
       #  2-byte workstation length
       #  @return [Integer]

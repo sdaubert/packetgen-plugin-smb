@@ -18,7 +18,7 @@ module PacketGen::Plugin
       # @!attribute lm_response
       #   A LM_RESPONSE or LMV2_RESPONSE structure that contains the computed
       #   LM response to the challenge.
-      #   @return [String]
+      #   @return [PacketGen::Types::String]
       # @!attribute lm_response_len
       #   16-bit unsigned integer that defines the size in bytes of
       #   {#lm_response} in {#payload}.
@@ -35,7 +35,7 @@ module PacketGen::Plugin
       # @!attribute nt_response
       #   A NTLM_RESPONSE or NTLMV2_RESPONSE structure that contains the computed
       #   NT response to the challenge.
-      #   @return [String]
+      #   @return [Ntlmv2Response]
       # @!attribute nt_response_len
       #   16-bit unsigned integer that defines the size in bytes of
       #   {#nt_response} in {#payload}.
@@ -51,7 +51,7 @@ module PacketGen::Plugin
 
       # @!attribute domain_name
       #  Name of the client authentication domain.
-      #  @return [String]
+      #  @return [SMB::String]
       # @!attribute domain_name_len
       #  2-byte {#domain_name} length
       #  @return [Integer]
@@ -66,7 +66,7 @@ module PacketGen::Plugin
 
       # @!attribute user_name
       #  Name of the user to be authenticated.
-      #  @return [String]
+      #  @return [SMB::String]
       # @!attribute user_name_len
       #  2-byte {#user_name} length
       #  @return [Integer]
@@ -81,7 +81,7 @@ module PacketGen::Plugin
 
       # @!attribute workstation
       #  Name of the client machine.
-      #  @return [String]
+      #  @return [SMB::String]
       # @!attribute workstation_len
       #  2-byte {#workstation} length
       #  @return [Integer]
@@ -96,7 +96,7 @@ module PacketGen::Plugin
 
       # @!attribute session_key
       #  The client's encrypted random session key. On
-      #  @return [String]
+      #  @return [PacketGen::Types::String]
       # @!attribute session_key_len
       #  2-byte {#session_key} length
       #  @return [Integer]

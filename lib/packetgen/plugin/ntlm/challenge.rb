@@ -15,7 +15,7 @@ module PacketGen::Plugin
       # @!attribute target_name
       #   Name of the server authentication realm. Must be expressed in the
       #   negotiated character set.
-      #   @return [String]
+      #   @return [SMB::String]
       # @!attribute target_name_len
       #   16-bit unsigned integer that defines the size in bytes of
       #   {#target_name} in {#payload}. This field is set only if {#request_target?}
