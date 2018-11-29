@@ -27,8 +27,8 @@ module PacketGen::Plugin
         super
         @unicode = options.key?(:unicode) ? options[:unicode] : true
         @null_terminated = options.key?(:null_terminated) ? options[:null_terminated] : true
-        self.encode!('UTF-16LE') if @unicode
-        self.encode!('ASCII-8BIT') unless @unicode
+        encoding = unicode? ? 'UTF-16LE' : 'ASCII-8BIT'
+        self.encode!(encoding)
       end
 
       # @return [Boolean]
@@ -68,11 +68,17 @@ module PacketGen::Plugin
         self
       end
 
+      # @return [String]
       def to_s
         s = super
         return s if null_terminated?
 
         s[0...-binary_terminator.size]
+      end
+
+      # @return [String]
+      def to_human
+        super.encode('UTF-8')
       end
 
       private

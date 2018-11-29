@@ -30,7 +30,7 @@ module PacketGen::Plugin
         expect(pkt.smb_trans_request.setup_count).to eq(2)
         expect(pkt.smb_trans_request.setup.map(&:to_i)).to eq([38, 30_255])
         expect(pkt.smb_trans_request.byte_count).to eq(89)
-        expect(pkt.smb_trans_request.name).to eq("\\PIPE\\".encode('UTF-16LE'))
+        expect(pkt.smb_trans_request.name).to eq("\\PIPE\\")
         expect(pkt.smb_trans_request.pad1.size).to eq(2)
       end
     end

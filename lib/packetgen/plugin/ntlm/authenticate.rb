@@ -47,7 +47,7 @@ module PacketGen::Plugin
       #   A 32-bit unsigned integer that defines the offset, in bytes, from
       #   the beginning of the AUTHENTICATE MESSAGE to {#nt_response} in {#payload}.
       #   @return [Integer]
-      define_in_payload :nt_response, PacketGen::Types::String
+      define_in_payload :nt_response, Ntlmv2Response
 
       # @!attribute domain_name
       #  Name of the client authentication domain.

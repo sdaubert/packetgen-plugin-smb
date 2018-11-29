@@ -39,8 +39,18 @@ module PacketGen::Plugin
         end
 
         it 'sets nt_response' do
-          expect(auth.nt_response[0, 4]).to eq(force_binary("\xc4\xe6\x34\x99"))
-          expect(auth.nt_response[-4, 4]).to eq([0].pack('N'.freeze))
+          expect(auth.nt_response).to be_a(Ntlmv2Response)
+
+          n2r = auth.nt_response
+          p n2r
+          expect(n2r.type).to eq(1)
+          expect(n2r.hi_type).to eq(1)
+          expect(n2r.reserved1).to eq(0)
+          expect(n2r.reserved2).to eq(0)
+          expect(n2r.timestamp).to eq('2018-10-04 18:13:04.467800000 UTC')
+          expect(n2r.client_challenge).to eq([0x01505ee9, 0x6aa1b71d].pack('N*'))
+          expect(n2r.reserved3).to eq(0)
+          expect(n2r.avpairs.size).to eq(10)
         end
 
         it 'sets domain_name' do
