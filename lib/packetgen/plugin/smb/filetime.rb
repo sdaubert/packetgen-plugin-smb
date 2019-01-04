@@ -22,6 +22,12 @@ module PacketGen::Plugin
       # String to parse time
       PARSE_TIME_STR = '%Y-%m-%d %H:%M:%S.%N %Z'
 
+      # Return a new Filetime object initialized to current time.
+      # @return [Filetime]
+      def self.now
+        new(time: Time.utcnow)
+      end
+
       # @param [Hash] options
       # @option options [Integer] :filetime
       # @option options [Time] :time
