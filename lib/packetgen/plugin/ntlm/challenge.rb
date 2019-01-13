@@ -108,7 +108,7 @@ module PacketGen::Plugin
       # @!attribute challenge
       #   64-bit value containing the NTLM challenge.
       #   @return [String]
-      define_field_before :payload, :challenge, PacketGen::Types::String, static_length: 8
+      define_field_before :payload, :challenge, PacketGen::Types::String, static_length: 8, default: VOID_CHALLENGE
       # @!attribute reserved
       #   64-bit reserved field
       #   @return [Integer]

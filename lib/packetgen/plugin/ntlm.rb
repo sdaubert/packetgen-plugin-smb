@@ -21,6 +21,7 @@ module PacketGen::Plugin
 
     # void version
     VOID_VERSION = [0].pack('q').freeze
+    VOID_CHALLENGE = VOID_VERSION
 
     # @!attribute signature
     #  8-byte NTLM signature
