@@ -25,7 +25,7 @@ module PacketGen::Plugin
       # Return a new Filetime object initialized to current time.
       # @return [Filetime]
       def self.now
-        new(time: Time.utcnow)
+        new(time: Time.now.utc)
       end
 
       # @param [Hash] options
