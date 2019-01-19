@@ -46,9 +46,47 @@ module PacketGen::Plugin
           expect(challenge.target_info[4]).to be_a(TimestampAvPair)
           expect(challenge.target_info[4].human_type).to eq('Timestamp')
           expect(challenge.target_info[4].value).to eq('2018-10-04 18:13:04.467800000 UTC')
-          expect(challenge.target_info[5]).to be_a(AvPair)
+          expect(challenge.target_info[5]).to be_a(EOLAvPair)
           expect(challenge.target_info[5].human_type).to eq('EOL')
           expect(challenge.target_info[5].value).to eq('')
+        end
+      end
+
+      describe '#to_s' do
+        let(:challenge) { Challenge.new }
+
+        it 'returns a string' do
+          str = force_binary('NTLMSSP' + [0, 2, 0, 0, 0, 0, 0, 0].pack('CL<QLQQQQ'))
+          expect(challenge.to_s).to eq(str)
+        end
+
+        it 'sets target name in output (no unicode)' do
+          challenge.target_name.read('MYNAME')
+          challenge.calc_length
+          expect(challenge.to_s).to end_with('MYNAME')
+        end
+
+        it 'sets target name in output (unicode)' do
+          challenge.flags_a = true
+          challenge.target_name.read('MYNAME')
+          challenge.calc_length
+          expect(challenge.to_s).to end_with(force_binary(utf16le('MYNAME')))
+        end
+
+        it 'sets target info in output (no unicode)' do
+          challenge.target_info << { type: 'DomainName', value: 'DESKTOP-1234567' }
+          challenge.target_info << { type: 'EOL', length: 0 }
+          challenge.calc_length
+          expect(challenge.to_s).to end_with(force_binary("DESKTOP-1234567\x00\x00\x00\x00"))
+        end
+
+        it 'sets target info in output (unicode)' do
+          challenge.flags_a = true
+          challenge.target_info << { type: 'DomainName', value: 'DESKTOP-1234567' }
+          challenge.target_info << { type: 'EOL', length: 0 }
+          challenge.calc_length
+          expect(challenge.to_s).to end_with(force_binary(utf16le('DESKTOP-1234567')) +
+                                             force_binary("\x00" * 4))
         end
       end
     end

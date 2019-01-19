@@ -71,6 +71,7 @@ module PacketGen::Plugin
       # @return [String]
       def to_s
         s = super
+        s.encode(self_encoding)
         return s if null_terminated?
 
         s[0...-binary_terminator.size]

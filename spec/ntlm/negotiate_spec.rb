@@ -108,13 +108,16 @@ module PacketGen::Plugin
 
         it 'sets domain_name in #payload' do
           nego.domain_name = 'DOMAIN'
+          nego.calc_length
           expect(nego.to_s).to end_with('DOMAIN')
         end
 
         it 'sets workstation in #payload' do
           nego.workstation = 'WORKSTATION'
+          nego.calc_length
           expect(nego.to_s).to end_with('WORKSTATION')
           nego.domain_name = 'DOMAIN'
+          nego.calc_length
           expect(nego.to_s).to end_with('DOMAINWORKSTATION')
         end
       end

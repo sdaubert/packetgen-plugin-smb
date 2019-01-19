@@ -35,6 +35,11 @@ module PacketGen::Plugin
       end
     end
 
+    # EOL AVPAIR structure, with no value
+    EOLAvPair = PacketGen::Types::AbstractTLV.create(type_class: PacketGen::Types::Int16leEnum,
+                                                     length_class: PacketGen::Types::Int16le)
+    EOLAvPair.define_type_enum AVPAIR_TYPES
+
     # Timestamp AVPAIR structure, with value of type {SMB::Filetime}.
     TimestampAvPair = PacketGen::Types::AbstractTLV.create(type_class: PacketGen::Types::Int16leEnum,
                                                            length_class: PacketGen::Types::Int16le,
@@ -57,10 +62,46 @@ module PacketGen::Plugin
     class ArrayOfAvPair < PacketGen::Types::Array
       set_of AvPair
 
+      # Get unicode property
+      # @return [Boolean]
+      def unicode
+        @unicode
+      end
+      alias unicode? unicode
+
+      # Set unicode property
+      # @param [Boolean] unicode
+      # @return [Boolean]
+      def unicode=(unicode)
+        @unicode = unicode
+        each { |avpair| avpair.value.unicode = unicode if avpair.value.respond_to? :unicode= }
+        unicode
+      end
+
+      # @return [String]
+      def to_s
+        self.unicode = unicode
+        super
+      end
+
       private
+
+      def record_from_hash(hsh)
+        obj = AvPair.new(type: hsh[:type])
+        klass = real_type(obj)
+
+        avpair = klass.new
+        avpair.type = hsh[:type]
+        avpair[:value].unicode = unicode? if avpair[:value].respond_to?(:unicode=)
+        avpair[:value].read(hsh[:value])
+        avpair.length = hsh[:length] || avpair[:value].sz
+        avpair
+      end
 
       def real_type(obj)
         case obj.type
+        when AVPAIR_TYPES['EOL']
+          EOLAvPair
         when AVPAIR_TYPES['Timestamp']
           TimestampAvPair
         when AVPAIR_TYPES['Flags']

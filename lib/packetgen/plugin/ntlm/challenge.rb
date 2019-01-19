@@ -29,7 +29,7 @@ module PacketGen::Plugin
       #   the beginning of the CHALLENGE MESSAGE to {#target_name} in {#payload}.
       #   This field is set only if {#request_target?} is set.
       #   @return [Integer]
-      define_in_payload :target_name
+      define_in_payload :target_name, SMB::String, null_terminated: false
 
       # @!attribute flags
       #   Negotiate flags

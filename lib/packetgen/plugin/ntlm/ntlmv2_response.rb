@@ -47,6 +47,13 @@ module PacketGen::Plugin
       # @!attribute avpairs
       #   @return [ArrayOfAvPair]
       define_field :avpairs, ArrayOfAvPair
+
+      # @return [false]
+      def empty?
+        false
+      end
+
+      alias size sz
     end
   end
 end

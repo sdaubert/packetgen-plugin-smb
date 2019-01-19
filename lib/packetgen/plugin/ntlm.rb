@@ -87,22 +87,52 @@ module PacketGen::Plugin
         alias_method :request_target?, :flags_c?
         alias_method :oem?, :flags_b?
         alias_method :unicode?, :flags_a?
+        alias_method :old_flags_a=, :flags_a=
+
+        class_eval do
+          def flags_a=(a)
+            self.old_flags_a = a
+            self.class.payload_fields.each do |name, type|
+              attr = send(name)
+              attr.unicode = a if attr.respond_to?(:unicode=)
+            end
+
+            a
+          end
+        end
       end
 
       # Define a field in payload. Also add +name_len+, +name_maxlen+ and
       # +name_offset+ fields.
       # @param [Symbol] name name of field.
       # @param [Class,nil] type type of +name+ field.
+      # @param [Hash] options type's options needed at build time
       # @return [void]
-      def define_in_payload(name, type=SMB::String)
+      def define_in_payload(name, type=SMB::String, options={})
         @payload_fields ||= {}
-        @payload_fields[name] = type
+        @payload_fields[name] = [type, options]
 
         define_field_before :payload, :"#{name}_len", PacketGen::Types::Int16le
         define_field_before :payload, :"#{name}_maxlen", PacketGen::Types::Int16le
         define_field_before :payload, :"#{name}_offset", PacketGen::Types::Int32le
 
         attr_accessor name
+      end
+    end
+
+    # @abstract This method is meaningful for {NTLM} subclasses only.
+    def initialize(options={})
+      super
+      return if self.class.payload_fields.nil?
+
+      self.class.payload_fields.each do |name, type_and_opt|
+        type, options = type_and_opt
+        content = if type.new.respond_to?(:unicode?)
+                    type.new(options.merge(unicode: unicode?))
+                  else
+                    type.new(options)
+                  end
+        send(:"#{name}=", content)
       end
     end
 
@@ -114,13 +144,14 @@ module PacketGen::Plugin
       super
       return self if self.class.payload_fields.nil?
 
-      self.class.payload_fields.each do |name, type|
+      self.class.payload_fields.each do |name, type_and_opt|
+        type, options = type_and_opt
         offset_in_payload = send(:"#{name}_offset") - offset_of(:payload)
         length = send(:"#{name}_len")
-        content = if type.respond_to?(:unicode?)
-                    type.new(unicode: unicode?)
+        content = if type.new.respond_to?(:unicode?)
+                    type.new(options.merge(unicode: unicode?))
                   else
-                    type.new
+                    type.new(options)
                   end
         content.read(payload[offset_in_payload, length]) if length > 0
         send(:"#{name}=", content)
@@ -137,7 +168,7 @@ module PacketGen::Plugin
       return self if self.class.payload_fields.nil?
 
       previous_len = 0
-      self.class.payload_fields.each do |name, _type|
+      self.class.payload_fields.each do |name, _type_and_opt|
         send(:"#{name}_len=", 0)
         send(:"#{name}_offset=", offset_of(:payload) + previous_len)
 
@@ -156,8 +187,10 @@ module PacketGen::Plugin
       s = super
       return s if self.class.payload_fields.nil?
 
-      self.class.payload_fields.each do |name, _type|
-        s << send(name).to_s unless send(name).nil?
+      self.class.payload_fields.each do |name, _type_and_opt|
+        attr = send(name)
+        attr.unicode = unicode? if attr.respond_to?(:unicode=)
+        s << attr.to_s unless attr.nil? || send("#{name}_len").zero?
       end
       s
     end
