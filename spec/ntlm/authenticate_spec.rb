@@ -71,6 +71,81 @@ module PacketGen::Plugin
           expect(auth.session_key).to eq(key)
         end
       end
+
+      describe '#to_s' do
+        let(:auth) { Authenticate.new }
+
+        it 'sets lm_response in output' do
+          auth.lm_response.read('RESPONSE')
+          auth.calc_length
+          expect(auth.to_s).to include('RESPONSE')
+        end
+
+        it 'sets NTLMv2 repsonse in output' do
+          auth.calc_length
+          expect(auth.to_s).to include(Ntlmv2Response.new.to_s)
+        end
+
+        it 'sets domain name in output (no unicode)' do
+          auth.domain_name.read('MYDOMAIN')
+          auth.calc_length
+          expect(auth.to_s).to end_with('MYDOMAIN')
+        end
+
+        it 'sets domain name in output (unicode)' do
+          auth.flags_a = true
+          auth.domain_name.read('MYDOMAIN')
+          auth.calc_length
+          expect(auth.to_s).to end_with(force_binary(utf16le('MYDOMAIN')))
+        end
+
+        it 'sets user name in output (no unicode)' do
+          auth.user_name.read('USER')
+          auth.calc_length
+          expect(auth.to_s).to end_with('USER')
+        end
+
+        it 'sets user name in output (unicode)' do
+          auth.flags_a = true
+          auth.user_name.read('USER')
+          auth.calc_length
+          expect(auth.to_s).to end_with(force_binary(utf16le('USER')))
+        end
+
+        it 'sets workstation in output (no unicode)' do
+          auth.workstation.read('WORKSTATION3')
+          auth.calc_length
+          expect(auth.to_s).to end_with('WORKSTATION3')
+        end
+
+        it 'sets workstation in output (unicode)' do
+          auth.flags_a = true
+          auth.workstation.read('WORKSTATION3')
+          auth.calc_length
+          expect(auth.to_s).to end_with(force_binary(utf16le('WORKSTATION3')))
+        end
+
+        it 'sets session key in output' do
+          auth.flags_a = true
+          auth.session_key.read('123456789abcdef')
+          auth.calc_length
+          expect(auth.to_s).to end_with(force_binary('123456789abcdef'))
+        end
+
+        it 'sets version in output' do
+          auth.flags_a = true
+          auth[:version].read('12345678')
+          auth.calc_length
+          expect(auth.to_s).to include(force_binary('12345678'))
+        end
+
+        it 'sets mic in output' do
+          auth.flags_a = true
+          auth[:mic].read('123456789abcdef0')
+          auth.calc_length
+          expect(auth.to_s).to include(force_binary('123456789abcdef0'))
+        end
+      end
     end
   end
 end

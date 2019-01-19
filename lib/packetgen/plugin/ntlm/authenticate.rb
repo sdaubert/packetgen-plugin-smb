@@ -62,7 +62,7 @@ module PacketGen::Plugin
       #  4-byte {#domain_name} offset from  the beginning of the AUTHENTICATE
       #  MESSAGE in {#payload}
       #  @return [Integer]
-      define_in_payload :domain_name
+      define_in_payload :domain_name, SMB::String, null_terminated: false
 
       # @!attribute user_name
       #  Name of the user to be authenticated.
@@ -77,7 +77,7 @@ module PacketGen::Plugin
       #  4-byte {#user_name} offset from  the beginning of the AUTHENTICATE
       #  MESSAGE in {#payload}
       #  @return [Integer]
-      define_in_payload :user_name
+      define_in_payload :user_name, SMB::String, null_terminated: false
 
       # @!attribute workstation
       #  Name of the client machine.
@@ -92,7 +92,7 @@ module PacketGen::Plugin
       #  4-byte {#workstation} offset from  the beginning of the AUTHENTICATE
       #  MESSAGE in {#payload}
       #  @return [Integer]
-      define_in_payload :workstation
+      define_in_payload :workstation, SMB::String, null_terminated: false
 
       # @!attribute session_key
       #  The client's encrypted random session key. On
