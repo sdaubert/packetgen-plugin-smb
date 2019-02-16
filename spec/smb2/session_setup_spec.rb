@@ -66,7 +66,7 @@ module PacketGen::Plugin
 
         it 'sets buffer offset' do
           req.calc_length
-          expect(req.buffer_offset).to eq(0x58)
+          expect(req.buffer_offset).to eq(0)
         end
       end
     end
@@ -105,7 +105,7 @@ module PacketGen::Plugin
 
         it 'sets buffer offset' do
           resp.calc_length
-          expect(resp.buffer_offset).to eq(0x48)
+          expect(resp.buffer_offset).to eq(0)
         end
       end
     end

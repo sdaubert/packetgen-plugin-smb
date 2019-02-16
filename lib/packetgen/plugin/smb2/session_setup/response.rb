@@ -55,8 +55,12 @@ module PacketGen::Plugin
         # Calculate and set {#buffer_length} and {#buffer_offset} fields.
         # @return [void]
         def calc_length
-          self.buffer_offset = SMB2.new.sz + offset_of(:buffer)
           self.buffer_length = self[:buffer].sz
+          self.buffer_offset = if self.buffer_length.zero?
+                                 0
+                               else
+                                 SMB2.new.sz + offset_of(:buffer)
+                               end
         end
 
         # Protocol name
