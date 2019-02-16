@@ -5,7 +5,7 @@
 # This program is published under MIT license.
 #
 # This small example implements a SMB responder. It responds to all SMB
-# Negotiate request to capture crdentials.
+# Negotiate request to capture credentials.
 # Before running it (as root), llmnr-responder should be running.
 
 # frozen_string_literal: true
@@ -26,7 +26,9 @@ Thread.abort_on_exception = true
 
 Credentials = Struct.new(:user, :computer, :challenge, :proof, :response, :ip) do
   def to_s
-    str = "User: #{user}\nComputer:#{computer} (IP: #{ip})\n"
+    user = self.user.encode('UTF-8')
+    computer = self.computer.encode('UTF-8')
+    str = +"User: #{user}\nComputer:#{computer} (IP: #{ip})\n"
     str << "Challenge: #{challenge}\nProof: #{proof}\n"
     str << "Response: #{response}"
   end
@@ -210,8 +212,10 @@ class Smb2Responder
 
         client.send(pkt_to_send.to_s, 0) if pkt_to_send
         client.close if closed
-        puts "closed: #{closed.inspect}"
-        p pkt_to_send
+
+        unless credentials.response.nil?
+          puts credentials.to_s
+        end
       end
     end
   end
