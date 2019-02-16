@@ -88,16 +88,22 @@ module PacketGen::Plugin
         alias_method :oem?, :flags_b?
         alias_method :unicode?, :flags_a?
         alias_method :old_flags_a=, :flags_a=
+        alias_method :old_flags=, :flags=
 
         class_eval do
-          def flags_a=(a)
-            self.old_flags_a = a
-            self.class.payload_fields.each do |name, type|
+          def flags_a=(value)
+            self.old_flags_a = value
+            self.class.payload_fields.each do |name, _|
               attr = send(name)
-              attr.unicode = a if attr.respond_to?(:unicode=)
+              attr.unicode = value if attr.respond_to?(:unicode=)
             end
 
-            a
+            value
+          end
+
+          def flags=(value)
+            self.old_flags = value
+            self.flags_a = value & 1
           end
         end
       end
@@ -175,9 +181,10 @@ module PacketGen::Plugin
         field = send(name)
         next unless field && !field.empty?
 
-        send(:"#{name}_len=", field.size)
-        send(:"#{name}_maxlen=", field.size)
-        previous_len = field.size
+        length = field.respond_to?(:sz) ? field.sz : field.size
+        send(:"#{name}_len=", length)
+        send(:"#{name}_maxlen=", length)
+        previous_len = length
       end
     end
 

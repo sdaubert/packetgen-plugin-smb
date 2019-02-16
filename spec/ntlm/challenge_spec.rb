@@ -81,7 +81,7 @@ module PacketGen::Plugin
         end
 
         it 'sets target info in output (unicode)' do
-          challenge.flags_a = true
+          challenge.flags = 1
           challenge.target_info << { type: 'DomainName', value: 'DESKTOP-1234567' }
           challenge.target_info << { type: 'EOL', length: 0 }
           challenge.calc_length
