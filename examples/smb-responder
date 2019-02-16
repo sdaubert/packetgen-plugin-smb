@@ -168,11 +168,9 @@ class Smb2Responder
 
       credentials = Credentials.new
       credentials.ip = client.peeraddr.last
-      p credentials
 
       until closed
         rcv_pkt = get_smb_data(client)
-        p rcv_pkt
 
         pkt_to_send = case rcv_pkt.headers.last.protocol_name
                       when 'SMB::Negotiate::Request'
@@ -188,11 +186,9 @@ class Smb2Responder
 
                       when 'SMB2::SessionSetup::Request'
                         gssapi = rcv_pkt.smb2_sessionsetup_request.buffer
-                        p gssapi
-                        puts gssapi[:token_resp][:response].class
                         if gssapi[:token_init][:mech_types].value.map(&:value).include?(NTLMSSP_OID)
                           pkt, challenge = first_session_setup_response(rcv_pkt)
-                          credentials.challenge = challenge
+                          credentials.challenge = binary2hex(challenge)
                           pkt
                         else
                           response = PacketGen::Plugin::NTLM.read(gssapi[:token_resp][:response].value)
@@ -200,7 +196,7 @@ class Smb2Responder
                             credentials.proof = binary2hex(response.nt_response.response)
                             credentials.user = response.user_name
                             credentials.computer = response.workstation
-                            credentials.response = binary2hex(response.nt_response.to_s[credentials.proof.size..-1])
+                            credentials.response = binary2hex(response.nt_response.to_s[response.nt_response[:response].sz..-5])
                             closed = true
                             deny_access rcv_pkt
                           else
