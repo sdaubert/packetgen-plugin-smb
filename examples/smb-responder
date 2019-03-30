@@ -34,19 +34,6 @@ Credentials = Struct.new(:user, :computer, :challenge, :proof, :response, :ip) d
   end
 end
 
-class PacketGen::Packet
-  def ===(other)
-    case other
-    when PacketGen::Packet
-      self == other
-    when String
-      is? other
-    else
-      false
-    end
-  end
-end
-
 class Smb2Responder
   attr_reader :socket, :guid, :salt
 
