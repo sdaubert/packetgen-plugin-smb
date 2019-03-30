@@ -34,7 +34,7 @@ class LlmnrResponder
 
     socket.bind(bind_addr, PacketGen::Plugin::LLMNR::UDP_PORT)
 
-    start_thread
+    start_loop
   end
 
   private
@@ -48,7 +48,7 @@ class LlmnrResponder
     socket.setsockopt(:IPPROTO_IP, :IP_ADD_MEMBERSHIP, mreq)
   end
 
-  def start_thread
+  def start_loop
     loop do
       data, peer = socket.recvfrom(1024)
       pkt = PacketGen.parse(data, first_header: 'LLMNR')
@@ -59,18 +59,20 @@ class LlmnrResponder
       log "received LLMNR request from #{peer_ip}"
 
       # Forge LLMNR response
-      pkt.llmnr.qr = true
-      pkt.llmnr.qd.each do |question|
+      response_pkt = pkt.reply
+      response_pkt.llmnr.qr = true
+      response_pkt.llmnr.qd.each do |question|
         next unless (question.human_rrclass == 'IN') && (question.human_type == 'A')
 
         log "Say to #{peer_ip} #{question.name} is #{my_ip}"
-        pkt.llmnr.an << { rtype: 'RR', name: question.name, rdata: my_ip_data }
+        answer = { rtype: 'RR', name: question.name, rdata: my_ip_data }
+        response_pkt.llmnr.an << answer
       end
-      pkt.calc
+      response_pkt.calc
 
-      next unless pkt.llmnr.ancount > 0
+      next unless response_pkt.llmnr.ancount > 0
 
-      socket.send(pkt.to_s, 0, peer_ip, peer_port)
+      socket.send(response_pkt.to_s, 0, peer_ip, peer_port)
     end
   end
 end
