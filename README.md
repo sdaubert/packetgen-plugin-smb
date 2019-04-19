@@ -15,7 +15,8 @@ This is a plugin for [PacketGen gem](https://github.com/sdaubert/packetgen). It 
     * SMB2 common header (support 2.x and 3.x dialects),
     * Negotiate command,
     * SessionSetup command,
-* GSSAPI, used to transport negotiation over SMB2 commands.
+* GSSAPI, used to transport negotiation over SMB2 commands,
+* NTLM, SMB authentication protocol.
 
 
 ## Installation
