@@ -9,7 +9,7 @@ module PacketGen::Plugin
   # Module to group all NetBIOS headers
   # @author Sylvain Daubert
   module NetBIOS
-    # NetBIOS Session Service messages.
+    # NetBIOS Datagram Service messages.
     # @author Sylvain Daubert
     class Datagram < PacketGen::Header::Base
       # Give protocol name
