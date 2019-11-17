@@ -41,6 +41,10 @@ Or install it yourself as:
 
 ## Usage
 
+### SMB2 with NTLM negociation
+
+See [examples/smb-responder](/examples/smb-responder).
+
 ### LLMNR
 
 LLMNR is a multicast protocol. Unless you want to have a fine control on UDP layer, the simplest way is to use it over a UDP ruby socket:
