@@ -1,9 +1,9 @@
+# frozen_string_literal: true
+
 # This file is part of packetgen-plugin-smb.
 # See https://github.com/sdaubert/packetgen-plugin-smb for more informations
 # Copyright (C) 2018 Sylvain Daubert <sylvain.daubert@laposte.net>
 # This program is published under MIT license.
-
-# frozen_string_literal: true
 
 module PacketGen::Plugin
   class SMB
@@ -128,7 +128,7 @@ module PacketGen::Plugin
         #  Padding before {#filename} to align it on 16-bit boundary. Only present
         #  if {SMB#flags2_unicode?} is +true+.
         #  @return [Integer]
-        define_field :pad1, PacketGen::Types::Int8, optional: ->(h) { h.packet && h.packet.smb.flags2_unicode? }
+        define_field :pad1, PacketGen::Types::Int8, optional: ->(h) { h&.packet&.smb&.flags2_unicode? }
         # @!attribute filename
         #  A string that represents the fully qualified name of the file
         #  relative to the supplied TID
@@ -154,6 +154,6 @@ module PacketGen::Plugin
           self.byte_count = bcount
         end
       end
-      end
+    end
   end
 end

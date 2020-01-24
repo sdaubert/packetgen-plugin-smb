@@ -1,9 +1,9 @@
+# frozen_string_literal: true
+
 # This file is part of packetgen-plugin-smb.
 # See https://github.com/sdaubert/packetgen-plugin-smb for more informations
 # Copyright (C) 2018 Sylvain Daubert <sylvain.daubert@laposte.net>
 # This program is published under MIT license.
-
-# frozen_string_literal: true
 
 module PacketGen::Plugin
   class SMB
@@ -96,7 +96,7 @@ module PacketGen::Plugin
         #  8-bit optional padding to align {#name} on a 2-byte boundary. Only present
         #  if {SMB#flags2_unicode?} is +true+.
         #  @return [Integer]
-        define_field :padname, PacketGen::Types::Int8, optional: ->(h) { h.packet && h.packet.smb.flags2_unicode? }
+        define_field :padname, PacketGen::Types::Int8, optional: ->(h) { h&.packet&.smb&.flags2_unicode? }
         # @!attribute name
         #  Pathname of the mailslot or named pipe.
         #  @return [String]

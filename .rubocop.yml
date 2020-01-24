@@ -1,3 +1,7 @@
+require:
+  - rubocop-performance
+Layout/LineLength:
+  Max: 150
 Layout/SpaceAroundEqualsInParameterDefault:
   EnforcedStyle: no_space
 Lint/EmptyWhen:
@@ -5,6 +9,8 @@ Lint/EmptyWhen:
 Lint/Void:
   Enabled: false
 Metrics:
+  Enabled: false
+Style/AccessModifierDeclarations:
   Enabled: false
 Style/AsciiComments:
   Enabled: false

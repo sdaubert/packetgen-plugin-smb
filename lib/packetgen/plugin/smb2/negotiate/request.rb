@@ -1,9 +1,9 @@
+# frozen_string_literal: true
+
 # This file is part of packetgen-plugin-smb.
 # See https://github.com/sdaubert/packetgen-plugin-smb for more informations
 # Copyright (C) 2018 Sylvain Daubert <sylvain.daubert@laposte.net>
 # This program is published under MIT license.
-
-# frozen_string_literal: true
 
 module PacketGen::Plugin
   class SMB2
@@ -161,9 +161,7 @@ module PacketGen::Plugin
           self[:pad].read SMB2::MAX_PADDING
 
           self.context_offset = 0
-          unless context_list.empty?
-            self.context_offset = SMB2::HEADER_SIZE + offset_of(:context_list)
-          end
+          self.context_offset = SMB2::HEADER_SIZE + offset_of(:context_list) unless context_list.empty?
           context_list.each { |ctx| ctx.calc_length if ctx.respond_to? :calc_length }
         end
       end

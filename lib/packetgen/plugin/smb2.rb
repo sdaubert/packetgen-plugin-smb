@@ -1,9 +1,9 @@
+# frozen_string_literal: true
+
 # This file is part of packetgen-plugin-smb.
 # See https://github.com/sdaubert/packetgen-plugin-smb for more informations
 # Copyright (C) 2018 Sylvain Daubert <sylvain.daubert@laposte.net>
 # This program is published under MIT license.
-
-# frozen_string_literal: true
 
 module PacketGen::Plugin
   # Server Message Block version 2 and 3 (SMB2) header.
@@ -84,7 +84,7 @@ module PacketGen::Plugin
     #  64-bit unique ID that is created by the server to handle operations
     #  asynchronously. Only present for asynchronous messages.
     #  @return [Integer]
-    define_field :async_id, PacketGen::Types::Int64le, optional: ->(h) { h.flags & 2  == 2}
+    define_field :async_id, PacketGen::Types::Int64le, optional: ->(h) { h.flags & 2 == 2 }
     # @!attribute reserved
     #  32-bit reserved field.
     #  Only present for synchronous messages.

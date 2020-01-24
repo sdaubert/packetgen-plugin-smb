@@ -1,9 +1,9 @@
+# frozen_string_literal: true
+
 # This file is part of packetgen-plugin-smb.
 # See https://github.com/sdaubert/packetgen-plugin-smb for more informations
 # Copyright (C) 2018 Sylvain Daubert <sylvain.daubert@laposte.net>
 # This program is published under MIT license.
-
-# frozen_string_literal: true
 
 module PacketGen::Plugin
   class SMB2
@@ -79,7 +79,7 @@ module PacketGen::Plugin
         define_field :prev_session_id, PacketGen::Types::Int64le
         # @!attribute buffer
         #  @return [GSSAPI]
-        define_field :buffer, GSSAPI, token: :response, optional: ->(h) { h.buffer_offset > 0 }
+        define_field :buffer, GSSAPI, token: :response, optional: ->(h) { h.buffer_offset.positive? }
 
         # Calculate and set {#buffer_length} and {#buffer_offset} fields.
         # @return [void]

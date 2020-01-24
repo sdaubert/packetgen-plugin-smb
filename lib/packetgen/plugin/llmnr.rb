@@ -1,9 +1,9 @@
+# frozen_string_literal: true
+
 # This file is part of packetgen-plugin-smb.
 # See https://github.com/sdaubert/packetgen-plugin-smb for more informations
 # Copyright (C) 2018 Sylvain Daubert <sylvain.daubert@laposte.net>
 # This program is published under MIT license.
-
-# frozen_string_literal: true
 
 module PacketGen::Plugin
   # Link-Local Multicast Name Resolution (LLMNR) header ({https://tools.ietf.org/html/rfc4795 RFC 4795}).
@@ -43,13 +43,13 @@ module PacketGen::Plugin
       ip.dst = dst unless dst.nil?
       ip.ttl = 1 if ip[:dst].mcast?
 
-      # rubocop:disable Lint/HandleExceptions
+      # rubocop:disable Lint/SuppressedException
       begin
         llh = ll_header(self)
         llh.dst = MAC_IPV4_MCAST if ip[:dst].mcast?
       rescue PacketGen::FormatError
       end
-      # rubocop:enable Lint/HandleExceptions
+      # rubocop:enable Lint/SuppressedException
     end
   end
   PacketGen::Header.add_class LLMNR

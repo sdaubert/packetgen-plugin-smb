@@ -1,9 +1,9 @@
+# frozen_string_literal: true
+
 # This file is part of packetgen-plugin-smb.
 # See https://github.com/sdaubert/packetgen-plugin-smb for more informations
 # Copyright (C) 2018 Sylvain Daubert <sylvain.daubert@laposte.net>
 # This program is published under MIT license.
-
-# frozen_string_literal: true
 
 module PacketGen::Plugin
   class SMB2
@@ -39,7 +39,7 @@ module PacketGen::Plugin
         #  @return [Boolean]
         # @!attribute flags_is_guest?
         #  @return [Boolean]
-        define_bit_fields_on :flags, :flags_rsv, 13,:flags_encrypt_data, :flags_is_null, :flags_is_guest
+        define_bit_fields_on :flags, :flags_rsv, 13, :flags_encrypt_data, :flags_is_null, :flags_is_guest
         # @!attribute buffer_offset
         #  The offset, from the beginning of the SMB2 header of the {#buffer}.
         #  @return [Integer]
@@ -50,7 +50,7 @@ module PacketGen::Plugin
         define_field :buffer_length, PacketGen::Types::Int16le
         # @!attribute buffer
         #  @return [GSSAPI]
-        define_field :buffer, GSSAPI, token: :response, optional: ->(h) { h.buffer_offset > 0 }
+        define_field :buffer, GSSAPI, token: :response, optional: ->(h) { h.buffer_offset.positive? }
 
         # Calculate and set {#buffer_length} and {#buffer_offset} fields.
         # @return [void]

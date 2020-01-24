@@ -1,9 +1,9 @@
+# frozen_string_literal: true
+
 # This file is part of PacketGen
 # See https://github.com/sdaubert/packetgen-plugin-smb for more informations
 # Copyright (C) 2016 Sylvain Daubert <sylvain.daubert@laposte.net>
 # This program is published under MIT license.
-
-# frozen_string_literal: true
 
 module PacketGen::Plugin
   # Module to group all NetBIOS headers
@@ -25,12 +25,12 @@ module PacketGen::Plugin
 
       # Session packet types
       TYPES = {
-        'message'           => 0,
-        'request'           => 0x81,
+        'message' => 0,
+        'request' => 0x81,
         'positive_response' => 0x82,
         'negative_response' => 0x83,
         'retarget_response' => 0x84,
-        'keep_alive'        => 0x85,
+        'keep_alive' => 0x85,
       }.freeze
 
       # @!attribute type

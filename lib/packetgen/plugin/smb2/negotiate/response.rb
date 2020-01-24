@@ -1,9 +1,9 @@
+# frozen_string_literal: true
+
 # This file is part of packetgen-plugin-smb.
 # See https://github.com/sdaubert/packetgen-plugin-smb for more informations
 # Copyright (C) 2018 Sylvain Daubert <sylvain.daubert@laposte.net>
 # This program is published under MIT license.
-
-# frozen_string_literal: true
 
 module PacketGen::Plugin
   class SMB2
@@ -140,7 +140,7 @@ module PacketGen::Plugin
         define_field :context_offset, PacketGen::Types::Int32le
         # @!attribute buffer
         #  @return [GSSAPI]
-        define_field :buffer, GSSAPI, token: :init, optional: ->(h) { h.buffer_offset > 0 }
+        define_field :buffer, GSSAPI, token: :init, optional: ->(h) { h.buffer_offset.positive? }
         # @!attribute pad
         #  Optional padding between the end of the {#buffer} field and the first negotiate
         #  context in {#context_list} so that the first negotiate context is 8-byte aligned
@@ -192,9 +192,7 @@ module PacketGen::Plugin
                                end
 
           self.context_offset = 0
-          unless context_list.empty?
-            self.context_offset = SMB2::HEADER_SIZE + offset_of(:context_list)
-          end
+          self.context_offset = SMB2::HEADER_SIZE + offset_of(:context_list) unless context_list.empty?
           context_list.each { |ctx| ctx.calc_length if ctx.respond_to? :calc_length }
         end
       end

@@ -1,9 +1,9 @@
+# frozen_string_literal: true
+
 # This file is part of packetgen-plugin-smb.
 # See https://github.com/sdaubert/packetgen-plugin-smb for more informations
 # Copyright (C) 2018 Sylvain Daubert <sylvain.daubert@laposte.net>
 # This program is published under MIT license.
-
-# frozen_string_literal: true
 
 module PacketGen::Plugin
   # Server Message Block (SMB) header.
@@ -11,16 +11,16 @@ module PacketGen::Plugin
   class SMB < PacketGen::Header::Base
     # Known commands
     COMMANDS = {
-      'delete_dir'     => 0x01,
-      'close'          => 0x04,
-      'delete'         => 0x06,
-      'query_info2'    => 0x23,
-      'trans'          => 0x25,
-      'echo'           => 0x2b,
-      'open_and_x'     => 0x2d,
-      'read_and_x'     => 0x2e,
-      'write_and_x'    => 0x2f,
-      'trans2'         => 0x32,
+      'delete_dir' => 0x01,
+      'close' => 0x04,
+      'delete' => 0x06,
+      'query_info2' => 0x23,
+      'trans' => 0x25,
+      'echo' => 0x2b,
+      'open_and_x' => 0x2d,
+      'read_and_x' => 0x2e,
+      'write_and_x' => 0x2f,
+      'trans2' => 0x32,
       'tree_disconnect' => 0x71,
       'negotiate' => 0x72,
       'session_setup_and_x' => 0x73,

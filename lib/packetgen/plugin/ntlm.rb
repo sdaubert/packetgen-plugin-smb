@@ -1,9 +1,9 @@
+# frozen_string_literal: true
+
 # This file is part of packetgen-plugin-smb.
 # See https://github.com/sdaubert/packetgen-plugin-smb for more informations
 # Copyright (C) 2018 Sylvain Daubert <sylvain.daubert@laposte.net>
 # This program is published under MIT license.
-
-# frozen_string_literal: true
 
 module PacketGen::Plugin
   # Base class for NTLM authentication protocol.
@@ -159,7 +159,7 @@ module PacketGen::Plugin
                   else
                     type.new(options)
                   end
-        content.read(payload[offset_in_payload, length]) if length > 0
+        content.read(payload[offset_in_payload, length]) if length.positive?
         send(:"#{name}=", content)
       end
 
