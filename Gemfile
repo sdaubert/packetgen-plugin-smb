@@ -13,6 +13,6 @@ group :noci do
   gem 'rubocop', '~> 1.6.0'
   gem 'rubocop-performance', '~> 1.9'
   gem 'ruby-debug-ide', '~> 0.7'
-  gem 'simplecov', '~> 0.20'
+  gem 'simplecov', '~> 0.18'
   gem 'yard', '~> 0.9'
 end
