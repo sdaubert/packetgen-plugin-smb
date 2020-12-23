@@ -207,7 +207,7 @@ module PacketGen::Plugin
 
       it '#calc_length compute length of data part' do
         ctx = Negotiate::Context.new
-        ctx[:data].replace 'abcd'
+        ctx[:data].string.replace 'abcd'
         ctx.calc_length
         expect(ctx.data_length).to eq(4)
 

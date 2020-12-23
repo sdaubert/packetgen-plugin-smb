@@ -13,7 +13,7 @@ module PacketGen::Plugin
           str = String.new(unicode: true)
           expect(str.encoding).to eq(Encoding::UTF_16LE)
           expect(str.unicode?).to be(true)
-          str = String.new
+          str = SMB::String.new
           expect(str.unicode?).to be(true)
         end
       end
@@ -71,6 +71,52 @@ module PacketGen::Plugin
             su.read('abcd')
             expect(su.encoding).to eq(Encoding::UTF_16LE)
             expect(su.to_human).to eq('abcd')
+          end
+        end
+      end
+
+      describe '#to_s' do
+        context '(ASCII)' do
+          it 'does set a null-byte if string is not null-terminated' do
+            s = String.new(unicode: false, null_terminated: false)
+            s.read('abcd'.force_encoding('BINARY'))
+            expect(s.to_s).to eq('abcd')
+
+            s.read("abcd\x00".force_encoding('BINARY'))
+            expect(s.to_s).to eq('abcd')
+          end
+
+          it 'sets a null terminator if strinf is null-terminated' do
+            s = String.new(unicode: false, null_terminated: true)
+            s.read('abcd'.force_encoding('BINARY'))
+            expect(s.to_s).to eq("abcd\x00")
+
+            s.read("abcd\x00".force_encoding('BINARY'))
+            expect(s.to_s).to eq("abcd\x00")
+          end
+        end
+
+        context '(unicode)' do
+          it 'does set a null-byte if string is not null-terminated' do
+            s = String.new(null_terminated: false)
+            s.read('abcd'.force_encoding('BINARY'))
+            expect(s.to_s).to eq(force_binary('abcd'))
+
+            s.read(utf16le("abcd\x00"))
+            expect(s.to_s).to eq(force_binary(utf16le('abcd')))
+            s.read(utf16le("abcd\x00").force_encoding('BINARY'))
+            expect(s.to_s).to eq(force_binary(utf16le('abcd')))
+          end
+
+          it 'sets a null terminator if strinf is null-terminated' do
+            s = String.new(null_terminated: true)
+            s.read('abcd'.force_encoding('BINARY'))
+            expect(s.to_s).to eq(force_binary("abcd\x00\x00"))
+            s.read(utf16le('abcd'))
+            expect(s.to_s).to eq(force_binary(utf16le("abcd\x00")))
+
+            s.read(utf16le("abcd\x00").force_encoding('BINARY'))
+            expect(s.to_s).to eq(force_binary(utf16le("abcd\x00")))
           end
         end
       end
