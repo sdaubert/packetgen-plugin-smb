@@ -113,6 +113,8 @@ module PacketGen::Plugin
     # @param [String] str
     # @return [self]
     def read(str)
+      return self if str.nil?
+
       parse!(str, ber: true)
       self
     end
