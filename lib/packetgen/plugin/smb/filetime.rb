@@ -10,6 +10,8 @@ module PacketGen::Plugin
     # SMB FILETIME.
     # @author Sylvain Daubert
     class Filetime
+      include PacketGen::Types::Fieldable
+
       # Base time for SMB FILETIME.
       # This value also indicate no time.
       NO_TIME = Time.utc(1601).freeze

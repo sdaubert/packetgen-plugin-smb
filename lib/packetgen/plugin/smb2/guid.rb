@@ -22,6 +22,8 @@ module PacketGen::Plugin
     #   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
     # @author Sylvain Daubert
     class GUID < PacketGen::Types::Fields
+      include PacketGen::Types::Fieldable
+
       # @!attribute data1
       #  32-bit little-endian data1
       #  @return [Integer]
