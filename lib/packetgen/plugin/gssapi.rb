@@ -61,6 +61,8 @@ module PacketGen::Plugin
   #   gssapi[:token_resp][:response]             #=> RASN1::Types::OctetString
   # @author Sylvain Daubert
   class GSSAPI < RASN1::Model
+    include PacketGen::Types::Fieldable
+
     # GSS API Negotiation Token Init
     #
     # A GSSAPI Negotiation Token Init is a ASN.1 SEQUENCE, explicitly tagged 0,
@@ -94,10 +96,14 @@ module PacketGen::Plugin
                          octet_string(:mech_list_mic, explicit: 3, class: :context, constructed: true, optional: true)]
     end
 
+    class NegTokenInitEnvelop < RASN1::Model
+      sequence(:init, implicit: 0, class: :application,
+               content: [objectid(:oid, value: '1.3.6.1.5.5.2'),
+                         model(:token_init, NegTokenInit)])
+    end
+
     choice :gssapi,
-           content: [sequence(:init, implicit: 0, class: :application,
-                              content: [objectid(:oid, value: '1.3.6.1.5.5.2'),
-                                        model(:token_init, NegTokenInit)]),
+           content: [model(:init_env, NegTokenInitEnvelop),
                      model(:token_resp, NegTokenResp)]
 
     # @param [Hash] args
@@ -119,10 +125,8 @@ module PacketGen::Plugin
       self
     end
 
-    # Get size of GSSAPI DER string, in bytes
-    # @return [Integer]
-    def sz
-      to_der.size
+    def to_human
+      inspect
     end
 
     alias to_s to_der

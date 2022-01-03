@@ -4,7 +4,7 @@ module PacketGen::Plugin
   class NTLM
     describe Negotiate do
       let(:raw_pkt) { read_raw_packets('smb2.pcapng')[4] }
-      let(:raw_str) { PacketGen.parse(raw_pkt).smb2_sessionsetup_request.buffer[:token_init][:mech_token].value }
+      let(:raw_str) { PacketGen.parse(raw_pkt).smb2_sessionsetup_request.buffer[:init_env][:token_init][:mech_token].value }
 
       describe '#read' do
         it 'parses a binary string' do

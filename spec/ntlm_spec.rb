@@ -5,7 +5,7 @@ module PacketGen::Plugin
     describe '.read' do
       it 'parses and decode a Negotiate message' do
         raw_pkt = read_raw_packets('smb2.pcapng')[4]
-        raw_nego_str = PacketGen.parse(raw_pkt).smb2_sessionsetup_request.buffer[:token_init][:mech_token].value
+        raw_nego_str = PacketGen.parse(raw_pkt).smb2_sessionsetup_request.buffer[:init_env][:token_init][:mech_token].value
         expect(NTLM.read(raw_nego_str)).to be_a(NTLM::Negotiate)
       end
 
