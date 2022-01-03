@@ -2,6 +2,6 @@
 
 module PacketGen
   module Plugin
-    SMB_VERSION = '0.6.2'
+    SMB_VERSION = '0.6.3'
   end
 end
