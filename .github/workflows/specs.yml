@@ -1,9 +1,11 @@
 name: Specs
+
 on:
   push:
     branches: [ master ]
   pull_request:
     branches: [ master ]
+
 jobs:
   test:
     strategy:
@@ -20,9 +22,12 @@ jobs:
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: ${{ matrix.ruby }}
+    - name: Install Gems
+      run: |
+        gem install bundler --no-document
+        bundle config set path 'vendor/bundle'
+        bundle config set --local without noci rubocop
+        bundle install
     - name: Run tests
       run: |
-        bundle config set path 'vendor/bundle'
-        bundle config set --local without noci
-        bundle install
         bundle exec rake
