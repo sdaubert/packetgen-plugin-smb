@@ -37,7 +37,7 @@ module PacketGen::Plugin
 
       def encode_name(name)
         basename, *scope_id = name.split('.')
-        basename = '' if basename.nil?
+        basename ||= ''
         scope_id = scope_id.join('.')
         encoded_name = +''
         basename.each_byte do |byte|
@@ -45,7 +45,7 @@ module PacketGen::Plugin
           b = (byte & 0xf) + 0x41
           encoded_name << [a, b].pack('C2')
         end
-        encoded_name << 'CA' * ((ENCODED_NAME_SIZE - encoded_name.size) / 2) if encoded_name.size < ENCODED_NAME_SIZE
+        encoded_name << ('CA' * ((ENCODED_NAME_SIZE - encoded_name.size) / 2)) if encoded_name.size < ENCODED_NAME_SIZE
         encoded_name << ".#{scope_id}" if scope_id
         encoded_name
       end
@@ -55,7 +55,7 @@ module PacketGen::Plugin
         encoded_name.partition('.').first.scan(/../).map do |duo|
           a = (duo[0].ord - 0x41) & 0xf
           b = (duo[1].ord - 0x41) & 0xf
-          name << (a << 4 | b).chr
+          name << ((a << 4) | b).chr
         end
         name.strip
       end

@@ -108,7 +108,7 @@ module PacketGen::Plugin
         # Say if FID is a directory
         # @return [Boolean]
         def directory?
-          self.directory > 0
+          self.directory.positive?
         end
 
         # @!method human_create_time
@@ -120,7 +120,7 @@ module PacketGen::Plugin
         # @!method human_change_time
         #  @return [String]
         %i[create access write change].each do |type|
-          class_eval "def human_#{type}_time; self[:#{type}_time].to_human; end"
+          class_eval "def human_#{type}_time; self[:#{type}_time].to_human; end" # def human_create_time; self[:create_time].to_human; end
         end
       end
     end

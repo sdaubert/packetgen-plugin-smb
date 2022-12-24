@@ -35,7 +35,7 @@ module PacketGen::Plugin
     #  @return [String]
     define_field :payload, PacketGen::Types::String
 
-    class <<self
+    class << self
       # @api private
       # Return fields defined in payload one.
       # @return [Hash]
@@ -55,7 +55,7 @@ module PacketGen::Plugin
 
       # Define a flags field.
       # @return [void]
-      def define_negotiate_flags
+      def define_negotiate_flags # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
         define_field_before :payload, :flags, PacketGen::Types::Int32le
         define_bit_fields_on :flags, :flags_w, :flags_v, :flags_u, :flags_r13, 3,
                              :flags_t, :flags_r4, :flags_s, :flags_r,
@@ -146,7 +146,7 @@ module PacketGen::Plugin
     # Populate object from a binary string
     # @param [String] str
     # @return [self]
-    def read(str)
+    def read(str) # rubocop:disable Metrics/AbcSize
       super
       return self if self.class.payload_fields.nil?
 

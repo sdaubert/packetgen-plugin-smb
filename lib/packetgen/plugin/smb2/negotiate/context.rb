@@ -47,7 +47,7 @@ module PacketGen::Plugin
         # @!attribute pad
         #  Padding to align next context on a 8-byte offset
         #  @return [String]
-        define_field :pad, PacketGen::Types::String, builder: ->(h, t) { t.new(length_from: -> { 8 - (h.offset_of(:data) + h.data_length) % 8 }) }
+        define_field :pad, PacketGen::Types::String, builder: ->(h, t) { t.new(length_from: -> { 8 - ((h.offset_of(:data) + h.data_length) % 8) }) }
 
         # @private
         alias old_read read
@@ -92,7 +92,7 @@ module PacketGen::Plugin
         #  Salt value for hash
         #  @return [String]
         define_field_before :pad, :salt, PacketGen::Types::String, builder: ->(h, t) { t.new(length_from: h[:salt_length]) }
-        update_field :pad, builder: ->(h, t) { t.new(length_from: -> { (8 - (h.offset_of(:salt) + h.salt_length) % 8) % 8 }) }
+        update_field :pad, builder: ->(h, t) { t.new(length_from: -> { (8 - ((h.offset_of(:salt) + h.salt_length) % 8)) }) }
       end
 
       # Specialized {Context} for ENCRYPTION_CAP type.
@@ -107,7 +107,7 @@ module PacketGen::Plugin
         #  algorithms
         #  @return [PacketGen::Types::ArrayOfInt16le]
         define_field_before :pad, :ciphers, PacketGen::Types::ArrayOfInt16le, builder: ->(h, t) { t.new(counter: h[:cipher_count]) }
-        update_field :pad, builder: ->(h, t) { t.new(length_from: -> { (8 - (h.offset_of(:cipher_count) + h[:cipher_count].sz) % 8) % 8 }) }
+        update_field :pad, builder: ->(h, t) { t.new(length_from: -> { (8 - ((h.offset_of(:cipher_count) + h[:cipher_count].sz) % 8)) % 8 }) }
       end
 
       # Array of {Context}

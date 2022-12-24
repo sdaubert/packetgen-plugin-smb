@@ -28,6 +28,7 @@ module PacketGen::Plugin
       'nt_trans' => 0xa0,
       'nt_create_and_x' => 0xa2
     }.freeze
+
     # SMB marker, on start of header
     MARKER = PacketGen.force_binary("\xffSMB")
 
@@ -190,8 +191,7 @@ module PacketGen::Plugin
                                .gsub!(/#{attr}_/, '')
           value = '%-16s (0x%02x)' % [value, self[attr].to_i]
           str = PacketGen::Inspect.shift_level
-          str << PacketGen::Inspect::FMT_ATTR % [self[attr].class.to_s.sub(/.*::/, ''),
-                                                 attr, value]
+          str << (PacketGen::Inspect::FMT_ATTR % [self[attr].class.to_s.sub(/.*::/, ''), attr, value])
         end
       end
     end

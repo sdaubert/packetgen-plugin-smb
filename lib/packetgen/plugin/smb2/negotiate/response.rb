@@ -102,9 +102,10 @@ module PacketGen::Plugin
         # @!attribute cap_dfs
         #  Indicates if Distributed File system (DFS) is supported
         #  @return [Boolean]
-        define_bit_fields_on :capabilities, :cap_rsv, 25, :cap_encryption, :cap_dir_leasing,
-                                            :cap_persistent_handles, :cap_multi_channel,
-                                            :cap_large_mtu, :cap_leasing, :cap_dfs
+        define_bit_fields_on :capabilities,
+                             :cap_rsv, 25, :cap_encryption, :cap_dir_leasing,
+                             :cap_persistent_handles, :cap_multi_channel,
+                             :cap_large_mtu, :cap_leasing, :cap_dfs
         # @!attribute max_trans_size
         #  32-bit value indicating the maximum size of the buffer used for
         #  QUERY_INFO, QUERY_DIRECTORY, SET_INFO and CHANGE_NOTIFY operations.
@@ -172,8 +173,7 @@ module PacketGen::Plugin
                                  .gsub!(/cap_/, '')
             value = '%-16s (0x%08x)' % [value, self[attr].to_i]
             str = PacketGen::Inspect.shift_level
-            str << PacketGen::Inspect::FMT_ATTR % [self[attr].class.to_s.sub(/.*::/, ''),
-                                                   attr, value]
+            str << (PacketGen::Inspect::FMT_ATTR % [self[attr].class.to_s.sub(/.*::/, ''), attr, value])
           end
         end
 
@@ -182,15 +182,23 @@ module PacketGen::Plugin
         # Also calculate lengths in {Context contexts}.
         # @return [void]
         def calc_length
-          self[:pad].read SMB2::MAX_PADDING
+          self[:pad].read(SMB2::MAX_PADDING)
+          calc_buffer_fields
+          calc_context_fields
+        end
 
+        private
+
+        def calc_buffer_fields
           self.buffer_length = self[:buffer].sz
           self.buffer_offset = if self.buffer_length.zero?
                                  0
                                else
                                  SMB2::HEADER_SIZE + offset_of(:buffer)
                                end
+        end
 
+        def calc_context_fields
           self.context_offset = 0
           self.context_offset = SMB2::HEADER_SIZE + offset_of(:context_list) unless context_list.empty?
           context_list.each { |ctx| ctx.calc_length if ctx.respond_to? :calc_length }

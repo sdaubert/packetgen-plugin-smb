@@ -104,7 +104,8 @@ module PacketGen::Plugin
         # @!attribute pad1
         #  Padding to align {#body} on 4-byte boundary.
         #  @return [String]
-        define_field :pad1, PacketGen::Types::String, default: "\0" * 4,
+        define_field :pad1, PacketGen::Types::String,
+                     default: "\0" * 4,
                      builder: ->(h, t) { t.new(length_from: -> { h.data_offset - SMB.new.sz - (h.offset_of(:name) + h[:name].sz) }) }
         # @!attribute body
         #  @return [String]

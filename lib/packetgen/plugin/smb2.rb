@@ -133,10 +133,11 @@ module PacketGen::Plugin
     # @!attribute flags_response?
     #  When set, the message is a response from server to client.
     #  @return [Boolean]
-    define_bit_fields_on :flags, :flags_rsv1, 2, :flags_smb3_replay_op, :flags_dfs_op,
-                                 :flags_rsv2, 21, :flags_smb3_priority, 3,
-                                 :flags_signed, :flags_related_op, :flags_async,
-                                 :flags_response
+    define_bit_fields_on :flags,
+                         :flags_rsv1, 2, :flags_smb3_replay_op, :flags_dfs_op,
+                         :flags_rsv2, 21, :flags_smb3_priority, 3,
+                         :flags_signed, :flags_related_op, :flags_async,
+                         :flags_response
 
     # Helper to bind a SMB2 command to {SMB2} header.
     # @param [String] command name
@@ -176,8 +177,7 @@ module PacketGen::Plugin
                              .gsub!(/#{attr}_/, '')
         value = '%-16s (0x%02x)' % [value, self[attr].to_i]
         str = PacketGen::Inspect.shift_level
-        str << PacketGen::Inspect::FMT_ATTR % [self[attr].class.to_s.sub(/.*::/, ''),
-                                               attr, value]
+        str << (PacketGen::Inspect::FMT_ATTR % [self[attr].class.to_s.sub(/.*::/, ''), attr, value])
       end
     end
   end

@@ -77,7 +77,8 @@ module PacketGen::Plugin
         # @!attribute pad1
         #  Padding before {#body} to align it on 32-bit boundary
         #  @return [Integer]
-        define_field :pad1, PacketGen::Types::String, default: "\0" * 4,
+        define_field :pad1, PacketGen::Types::String,
+                     default: "\0" * 4,
                      builder: ->(h, t) { t.new(length_from: -> { h.data_offset - SMB.new.sz - (h.offset_of(:byte_count) + h[:byte_count].sz) }) }
         # @!attribute body
         #  @return [String]

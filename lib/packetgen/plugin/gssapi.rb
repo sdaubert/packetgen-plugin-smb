@@ -73,7 +73,8 @@ module PacketGen::Plugin
     # * +mech_token+ is an optional OCTET STRING, explicitly tagged 2.
     # * +mech_list_mic+ is an optional OCTET STRING, explicitly tagged 3.
     class NegTokenInit < RASN1::Model
-      sequence :token, explicit: 0, class: :context, constructed: true,
+      sequence :token,
+               explicit: 0, class: :context, constructed: true,
                content: [sequence_of(:mech_types, RASN1::Types::ObjectId, explicit: 0, class: :context),
                          bit_string(:req_flags, explicit: 1, class: :context, constructed: true, optional: true),
                          octet_string(:mech_token, explicit: 2, class: :context, constructed: true, optional: true),
@@ -89,7 +90,8 @@ module PacketGen::Plugin
         'reject' => 2,
         'request-mic' => 3
       }.freeze
-      sequence :token, explicit: 1, class: :context, constructed: true,
+      sequence :token,
+               explicit: 1, class: :context, constructed: true,
                content: [enumerated(:negstate, enum: NEG_STATES, explicit: 0, class: :context, constructed: true, optional: true),
                          objectid(:supported_mech, explicit: 1, class: :context, constructed: true, optional: true),
                          octet_string(:response, explicit: 2, class: :context, constructed: true, optional: true),
@@ -98,8 +100,8 @@ module PacketGen::Plugin
 
     class NegTokenInitEnvelop < RASN1::Model
       sequence(:init, implicit: 0, class: :application,
-               content: [objectid(:oid, value: '1.3.6.1.5.5.2'),
-                         model(:token_init, NegTokenInit)])
+                      content: [objectid(:oid, value: '1.3.6.1.5.5.2'),
+                                model(:token_init, NegTokenInit)])
     end
 
     choice :gssapi,

@@ -21,7 +21,7 @@ module PacketGen::Plugin
         # @!attribute dialect
         #  Null-terminated string identifying a SMB dialect.
         #  @return [String]
-        define_field :dialect,PacketGen::Types::CString
+        define_field :dialect, PacketGen::Types::CString
 
         # @return [String]
         def to_human

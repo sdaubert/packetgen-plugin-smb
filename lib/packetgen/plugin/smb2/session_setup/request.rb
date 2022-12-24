@@ -68,7 +68,7 @@ module PacketGen::Plugin
         # @!attribute buffer_offset
         #  The offset, from the beginning of the SMB2 header of the {#buffer}.
         #  @return [Integer]
-        define_field :buffer_offset, PacketGen::Types::Int16le, default: SMB2::HEADER_SIZE + 6 * 4
+        define_field :buffer_offset, PacketGen::Types::Int16le, default: SMB2::HEADER_SIZE + (6 * 4)
         # @!attribute buffer_length
         #  The length of the {#buffer} field.
         #  @return [Integer]

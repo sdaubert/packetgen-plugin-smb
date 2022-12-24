@@ -91,9 +91,10 @@ module PacketGen::Plugin
         # @!attribute cap_dfs
         #  Indicates if Distributed File system (DFS) is supported
         #  @return [Boolean]
-        define_bit_fields_on :capabilities, :cap_rsv, 25, :cap_encryption, :cap_dir_leasing,
-                                            :cap_persistent_handles, :cap_multi_channel,
-                                            :cap_large_mtu, :cap_leasing, :cap_dfs
+        define_bit_fields_on :capabilities,
+                             :cap_rsv, 25, :cap_encryption, :cap_dir_leasing,
+                             :cap_persistent_handles, :cap_multi_channel,
+                             :cap_large_mtu, :cap_leasing, :cap_dfs
         # @!attribute client_guid
         #  @return []
         define_field :client_guid, GUID
@@ -131,25 +132,20 @@ module PacketGen::Plugin
         end
 
         # @return [String]
-        def inspect
+        def inspect # rubocop:disable Metrics/AbcSize
           super do |attr|
             case attr
             when :capabilities
-              value = bits_on(attr).reject { |_, v| v > 1 }
+              value = bits_on(attr).select { |_, v| v == 1 }
                                    .keys
                                    .select { |b| send("#{b}?") }
-                                   .map(&:to_s)
+                                   .map { |v| v.to_s.delete_prefix('cap_') }
                                    .join(',')
-                                   .gsub!(/cap_/, '')
               value = '%-16s (0x%08x)' % [value, self[attr].to_i]
-              str = PacketGen::Inspect.shift_level
-              str << PacketGen::Inspect::FMT_ATTR % [self[attr].class.to_s.sub(/.*::/, ''),
-                                                     attr, value]
+              inspect_attr(attr, value)
             when :dialects
               list = self.dialects.map { |v| '%#x' % v.to_i }.join(',')
-              str = PacketGen::Inspect.shift_level
-              str << PacketGen::Inspect::FMT_ATTR % [self[attr].class.to_s.sub(/.*::/, ''),
-                                                     attr, list]
+              inspect_attr(attr, list)
             end
           end
         end
@@ -163,6 +159,13 @@ module PacketGen::Plugin
           self.context_offset = 0
           self.context_offset = SMB2::HEADER_SIZE + offset_of(:context_list) unless context_list.empty?
           context_list.each { |ctx| ctx.calc_length if ctx.respond_to? :calc_length }
+        end
+
+        private
+
+        def inspect_attr(attr, value)
+          str = PacketGen::Inspect.shift_level
+          str << (PacketGen::Inspect::FMT_ATTR % [self[attr].class.to_s.sub(/.*::/, ''), attr, value])
         end
       end
     end
