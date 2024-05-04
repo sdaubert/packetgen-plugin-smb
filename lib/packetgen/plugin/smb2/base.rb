@@ -22,7 +22,7 @@ module PacketGen::Plugin
           (8 - (hdr.offset_of(prev_field) + hdr[prev_field].sz) % 8) % 8
         end
         define_field name, PacketGen::Types::String, default: SMB2::MAX_PADDING,
-                     builder: ->(h, t) { t.new(length_from: -> { lf[h] }) }
+                                                     builder: ->(h, t) { t.new(length_from: -> { lf[h] }) }
       end
     end
   end

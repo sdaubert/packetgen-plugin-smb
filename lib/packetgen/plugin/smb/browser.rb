@@ -46,7 +46,7 @@ module PacketGen::Plugin
       # @return [Browser] may return a subclass object if a more specific class
       #   may be determined
       def read(str)
-        if self.class == Browser
+        if self.instance_of?(Browser)
           return self if str.nil?
 
           PacketGen.force_binary str
@@ -71,7 +71,7 @@ module PacketGen::Plugin
       def added_to_packet(packet)
         return if packet.respond_to? :smb_browser
 
-        packet.instance_eval("def smb_browser(arg=nil); header(#{self.class}, arg); end")
+        packet.instance_eval("def smb_browser(arg=nil); header(#{self.class}, arg); end") # def smb_browser(arg=nil); header(Browser, arg); end
       end
 
       private

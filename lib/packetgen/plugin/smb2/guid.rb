@@ -47,7 +47,7 @@ module PacketGen::Plugin
       def to_human
         data4p1 = data4 >> 48
         data4p2 = data4 & 0xffff_ffff_ffff
-        "%08x-%04x-%04x-%04x-%012x" % [data1, data2, data3, data4p1, data4p2]
+        '%08x-%04x-%04x-%04x-%012x' % [data1, data2, data3, data4p1, data4p2] # rubocop:disable Style/FormatStringToken
       end
 
       # Set GUID from a human-readable string
@@ -56,13 +56,13 @@ module PacketGen::Plugin
       def from_human(guid)
         return self if guid.nil? || guid.empty?
 
-        values = guid.split('-')
+        values = guid.split('-').map { |v| v.to_i(16) }
         return self if values.size != 5
 
-        self.data1 = values[0].to_i(16)
-        self.data2 = values[1].to_i(16)
-        self.data3 = values[2].to_i(16)
-        self.data4 = values[3].to_i(16) << 48 | values[4].to_i(16)
+        self.data1 = values[0]
+        self.data2 = values[1]
+        self.data3 = values[2]
+        self.data4 = values[3] << 48 | values[4]
         self
       end
     end

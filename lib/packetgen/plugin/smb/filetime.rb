@@ -35,9 +35,7 @@ module PacketGen::Plugin
       # @option options [Time] :time
       # @raise [ArgumentError] if +:time+ and +:filetime+ are both given.
       def initialize(options={})
-        if (options.keys & %i[time filetime]).size == 2
-          raise ArgumentError, ':time and :filetime options are both given'
-        end
+        raise ArgumentError, ':time and :filetime options are both given' if options.key?(:time) && options.key?(:filetime)
 
         @int = PacketGen::Types::SInt64le.new(options[:filetime])
         if options[:time]
