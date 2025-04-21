@@ -61,7 +61,7 @@ module PacketGen::Plugin
   #   gssapi[:token_resp][:response]             #=> RASN1::Types::OctetString
   # @author Sylvain Daubert
   class GSSAPI < RASN1::Model
-    include PacketGen::Types::Fieldable
+    include BinStruct::Structable
 
     # GSS API Negotiation Token Init
     #

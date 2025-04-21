@@ -16,11 +16,11 @@ module PacketGen::Plugin
         #  The size, in 2-byte words, of the SMB command parameters. It should
         #  be +3+.
         #  @return [Integer]
-        define_field :word_count, PacketGen::Types::Int8, default: 3
+        define_attr :word_count, BinStruct::Int8, default: 3
         # @!attribute fid
         #  16-bit FID of the object to close
         #  @return [Integer]
-        define_field :fid, PacketGen::Types::Int16le, default: 3
+        define_attr :fid, BinStruct::Int16le, default: 3
         # @!attribute last_modified
         #  32-bit time value encoded as the number of seconds since January
         #  1, 1970 00:00:00.0. The client can request that the last modification
@@ -28,11 +28,11 @@ module PacketGen::Plugin
         #  or +0xFFFFFFFF+ results in the server not updating the last modification
         #  time.
         #  @return [Integer]
-        define_field :last_modified, PacketGen::Types::Int32le
+        define_attr :last_modified, BinStruct::Int32le
         # @!attribute byte_count
         #  Should be 0.
         #  @return [Integer]
-        define_field :byte_count, PacketGen::Types::Int16le, default: 0
+        define_attr :byte_count, BinStruct::Int16le, default: 0
 
         # Give protocol name for this class
         # @return [String]

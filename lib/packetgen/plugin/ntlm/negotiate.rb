@@ -15,7 +15,7 @@ module PacketGen::Plugin
       # @return [String]
       attr_accessor :workstation
 
-      update_field :type, default: NTLM::TYPES['negotiate']
+      update_attr :type, default: NTLM::TYPES['negotiate']
       # @!attribute flags
       #   Negotiate flags
       #   @return [Integer]
@@ -92,7 +92,7 @@ module PacketGen::Plugin
 
       # @!attribute domain_name
       #  Name of the client authentication domain. Must be OEM encoded.
-      #  @return [PacketGen::Types::String]
+      #  @return [BinStruct::String]
       # @!attribute domain_name_len
       #  2-byte domain name length
       #  @return [Integer]
@@ -102,11 +102,11 @@ module PacketGen::Plugin
       # @!attribute domain_name_offset
       #  4-byte domain name offset
       #  @return [Integer]
-      define_in_payload :domain_name, PacketGen::Types::String
+      define_in_payload :domain_name, BinStruct::String
 
       # @!attribute workstation
       #  Name of the client machine. Must be OEM encoded.
-      #  @return [PacketGen::Types::String]
+      #  @return [BinStruct::String]
       # @!attribute workstation_len
       #  2-byte workstation length
       #  @return [Integer]
@@ -116,12 +116,12 @@ module PacketGen::Plugin
       # @!attribute workstation_offset
       #  4-byte workstation offset
       #  @return [Integer]
-      define_in_payload :workstation, PacketGen::Types::String
+      define_in_payload :workstation, BinStruct::String
 
       # @!attribute version
       #  8-byte version information
       #  @return [String]
-      define_field_before :payload, :version, PacketGen::Types::String, static_length: 8, default: VOID_VERSION
+      define_attr_before :payload, :version, BinStruct::String, static_length: 8, default: VOID_VERSION
     end
   end
 end

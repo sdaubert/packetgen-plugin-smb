@@ -13,7 +13,7 @@ module PacketGen::Plugin
     # @author Sylvain Daubert
     class String
       extend Forwardable
-      include PacketGen::Types::Fieldable
+      include BinStruct::Structable
 
       def_delegators :@string, :[], :length, :size, :inspect, :==, :<<,
                      :unpack, :force_encoding, :encoding, :index, :empty?,

@@ -102,13 +102,13 @@ module PacketGen::Plugin
 
       it 'puts a line for each attribute but body' do
         str = smb2.inspect
-        (smb2.fields - %i[body async_id]).each do |field|
+        (smb2.attributes - %i[body async_id]).each do |field|
           expect(str).to include(field.to_s)
         end
 
         smb2 = SMB2.new(flags_async: true)
         str = smb2.inspect
-        (smb2.fields - %i[body reserved tree_id]).each do |field|
+        (smb2.attributes - %i[body reserved tree_id]).each do |field|
           expect(str).to include(field.to_s)
         end
       end

@@ -22,50 +22,50 @@ module PacketGen::Plugin
           @protocol_name = "SMB::Browser::#{basename}"
         end
 
-        remove_field :body
-        update_field :opcode, default: 1
+        remove_attr :body
+        update_attr :opcode, default: 1
         # @!attribute update_count
         #  8-bit integer. Not used. Should be 0
         #  @return [Integer]
-        define_field :update_count, PacketGen::Types::Int8, default: 0
+        define_attr :update_count, BinStruct::Int8, default: 0
         # @!attribute periodicity
         #  32-bit integer that must be the announcement frequency of the
         #  server in milliseconds.
         # @return [Integer]
-        define_field :periodicity, PacketGen::Types::Int32le
+        define_attr :periodicity, BinStruct::Int32le
         # @!attribute server_name
         #  Null-terminated ASCII string of 16-byte length. Used to identify
         #  server.
         #  @return [String]
-        define_field :server_name, PacketGen::Types::CString, static_length: 16
+        define_attr :server_name, BinStruct::CString, static_length: 16
         # @!attribute os_ver_maj
         #  8-bit integer indicating the OS major version number
         #  @return [Integer]
-        define_field :os_ver_maj, PacketGen::Types::Int8
+        define_attr :os_ver_maj, BinStruct::Int8
         # @!attribute os_ver_min
         #  8-bit integer indicating the OS minor version number
         #  @return [Integer]
-        define_field :os_ver_min, PacketGen::Types::Int8
+        define_attr :os_ver_min, BinStruct::Int8
         # @!attribute server_type
         #  32-bit integer indicating the type of the server
         #  @return [Integer]
-        define_field :server_type, PacketGen::Types::Int32le
+        define_attr :server_type, BinStruct::Int32le
         # @!attribute browser_ver_maj
         #  8-bit Browser protocol major version number. Should be 15.
         #  @return [Integer]
-        define_field :browser_ver_maj, PacketGen::Types::Int8, default: 15
+        define_attr :browser_ver_maj, BinStruct::Int8, default: 15
         # @!attribute browser_ver_min
         #  8-bit Browser protocol minor version number. Should be 1.
         #  @return [Integer]
-        define_field :browser_ver_min, PacketGen::Types::Int8, default: 1
+        define_attr :browser_ver_min, BinStruct::Int8, default: 1
         # @!attribute signature
         #  16-bit sinature integer. Should be 0xAA55.
         #  @return [Integer]
-        define_field :signature, PacketGen::Types::Int16le, default: 0xaa55
+        define_attr :signature, BinStruct::Int16le, default: 0xaa55
         # @!attribute comment
         #  Null-terminated ASCII string.
         #  @return [String]
-        define_field :comment, PacketGen::Types::CString
+        define_attr :comment, BinStruct::CString
       end
       PacketGen::Header.add_class HostAnnouncement
       SMB::Trans::Request.bind HostAnnouncement, name: '\\MAILSLOT\\BROWSE', body: ->(v) { v[0] == OPCODES['HostAnnouncement'] }

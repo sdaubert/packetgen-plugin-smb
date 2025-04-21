@@ -20,7 +20,7 @@ module PacketGen::Plugin
         expect(nego.reserved).to eq(0)
         expect(nego.capabilities).to eq(0x7f)
         nego.bits_on(:capabilities).each do |k, v|
-          next if v > 1
+          next unless nego.respond_to?("#{k}?")
           expect(nego.send("#{k}?")).to be(true)
         end
         expect(nego.client_guid).to eq('7aedb437-01b9-41d4-a5f7-9e6c06e16c8a')
@@ -63,9 +63,9 @@ module PacketGen::Plugin
         end
 
         it 'handles dialects field' do
-          inttype = PacketGen::Types::Int16le
-          nr.dialects << inttype.new(0x101)
-          nr.dialects << inttype.new(0x202)
+          inttype = BinStruct::Int16le
+          nr.dialects << inttype.new(value: 0x101)
+          nr.dialects << inttype.new(value: 0x202)
           str = nr.inspect.split("\n").find { |l| l =~ /dialects/ }
           expect(str).to include('0x101,0x202')
         end
@@ -84,9 +84,9 @@ module PacketGen::Plugin
         end
 
         it 'sets pad field' do
-          nr[:buffer] = PacketGen::Types::String.new
+          nr[:buffer] = BinStruct::String.new
           6.times do |i|
-            nr[:dialects] << PacketGen::Types::Int16le.new(i) unless i == 0
+            nr[:dialects] << BinStruct::Int16le.new(value: i) unless i == 0
             nr.calc_length
             expect(nr.pad.size).to eq((4 - i * 2) % 8)
           end
@@ -173,14 +173,14 @@ module PacketGen::Plugin
         end
 
         it 'sets buffer_length field' do
-          nr[:buffer] = PacketGen::Types::String.new
+          nr[:buffer] = BinStruct::String.new
           nr[:buffer].read 'abcdef'
           nr.calc_length
           expect(nr.buffer_length).to eq(6)
         end
 
         it 'sets pad field' do
-          nr[:buffer] = PacketGen::Types::String.new
+          nr[:buffer] = BinStruct::String.new
           12.times do |i|
             nr[:buffer].read('a' * i)
             nr.calc_length
@@ -212,7 +212,7 @@ module PacketGen::Plugin
         expect(ctx.data_length).to eq(4)
 
         ctx = Negotiate::PreauthIntegrityCap.new
-        ctx.hash_alg << PacketGen::Types::Int16le.new(1)
+        ctx.hash_alg << BinStruct::Int16le.new(vallue: 1)
         ctx.calc_length
         expect(ctx.data_length).to eq(6)
       end

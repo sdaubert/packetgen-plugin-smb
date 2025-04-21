@@ -35,58 +35,15 @@ module PacketGen::Plugin
     # @!attribute protocol
     #  This field must contain {MARKER SMB marker}
     #  @return [String]
-    define_field :protocol, PacketGen::Types::String, static_length: 4, default: MARKER
+    define_attr :protocol, BinStruct::String, static_length: 4, default: MARKER
     # @!attribute command
     #  8-bit SMB command
     #  @return [Integer]
-    define_field :command, PacketGen::Types::Int8Enum, enum: COMMANDS
+    define_attr :command, BinStruct::Int8Enum, enum: COMMANDS
     # @!attribute status
     #  32-bit status field. Used to communicate errors from server to client.
     #  @return [Integer]
-    define_field :status, PacketGen::Types::Int32le
-    # @!attribute flags
-    #  8-bit flags field
-    #  @return [Integer]
-    define_field :flags, PacketGen::Types::Int8
-    # @!attribute flags2
-    #  16-bit flags field
-    #  @return [Integer]
-    define_field :flags2, PacketGen::Types::Int16le
-    # @!attribute pid_high
-    #  16 high order bits of a process identifier (PID)
-    #  @return [Integer]
-    define_field :pid_high, PacketGen::Types::Int16le
-    # @!attribute sec_features
-    #  64-bit field. May be:
-    #  * a 64-bit cryptographic message signature if signature was negotiated,
-    #  * a SecurityFeatures structure, only over connectionless transport,
-    #    composed of:
-    #    * a 16-bit sequence number,
-    #    * a 16-bit connection identifier (CID),
-    #    * a 32-bit key to validate message,
-    #  * a reserved field in all others cases.
-    #  @return [Integer]
-    define_field :sec_features, PacketGen::Types::Int64le
-    # @!attribute reserved
-    #  16-bit reserved field
-    #  @return [Integer]
-    define_field :reserved, PacketGen::Types::Int16le
-    # @!attribute tid
-    #  16-bit tree identifier (TID)
-    define_field :tid, PacketGen::Types::Int16le
-    # @!attribute pid
-    #  16 low order bits of a process identifier (PID)
-    #  @return [Integer]
-    define_field :pid, PacketGen::Types::Int16le
-    # @!attribute uid
-    #  16-bit user identifier (UID)
-    define_field :uid, PacketGen::Types::Int16le
-    # @!attribute mid
-    #  16-bit multiplex identifier (MID)
-    define_field :mid, PacketGen::Types::Int16le
-    # @!attribute body
-    #  @return [String]
-    define_field :body, PacketGen::Types::String
+    define_attr :status, BinStruct::Int32le
     # @!attribute flags_reply?
     #  When set, the message is a reply from server to client.
     #  @return [Boolean]
@@ -111,9 +68,9 @@ module PacketGen::Plugin
     #  When set in SMB_COM_NEGOTIATE response, the server supports
     #  SMB_COM_LOCK_AND_READ and SNB_COM_WRITE_AND_UNLOCK commands.
     #  @return [Boolean]
-    define_bit_fields_on :flags, :flags_reply, :flags_opbatch, :flags_oplock,
-                         :flags_canon_paths, :flags_case_insensitive,
-                         :flags_reserved, :flags_buf_avail, :flags_locknread
+    define_bit_attr :flags, flags_reply: 1, flags_opbatch: 1, flags_oplock: 1,
+                            flags_canon_paths: 1, flags_case_insensitive: 1,
+                            flags_reserved: 1, flags_buf_avail: 1, flags_locknread: 1
     # @!attribute flags2_unicode?
     #  If set, each field that contains a string in this message is encoded
     #  as UTF-16.
@@ -152,12 +109,47 @@ module PacketGen::Plugin
     # @!attribute flags2_long_names?
     #  If unset, file names must adhere to the 8.3 naming convention.
     #  @return [Boolean]
-    define_bit_fields_on :flags2, :flags2_unicode, :flags2_ntstatus,
-                         :flags2_paging_io, :flags2_dfs, :flags2_extended_security,
-                         :flags2_reparse_path, :flags2_reserved, 3,
-                         :flags2_is_long_name, :flags2_rsv,
-                         :flags2_security_signature_required, :flags2_compresses,
-                         :flags2_signature, :flags2_eas, :flags2_long_names
+    define_bit_attr :flags2, endian: :little, flags2_unicode: 1, flags2_ntstatus: 1,
+                             flags2_paging_io: 1, flags2_dfs: 1, flags2_extended_security: 1,
+                             flags2_reparse_path: 1, flags2_reserved: 3,
+                             flags2_is_long_name: 1, flags2_rsv: 1,
+                             flags2_security_signature_required: 1, flags2_compresses: 1,
+                             flags2_signature: 1, flags2_eas: 1, flags2_long_names: 1
+    # @!attribute pid_high
+    #  16 high order bits of a process identifier (PID)
+    #  @return [Integer]
+    define_attr :pid_high, BinStruct::Int16le
+    # @!attribute sec_features
+    #  64-bit field. May be:
+    #  * a 64-bit cryptographic message signature if signature was negotiated,
+    #  * a SecurityFeatures structure, only over connectionless transport,
+    #    composed of:
+    #    * a 16-bit sequence number,
+    #    * a 16-bit connection identifier (CID),
+    #    * a 32-bit key to validate message,
+    #  * a reserved field in all others cases.
+    #  @return [Integer]
+    define_attr :sec_features, BinStruct::Int64le
+    # @!attribute reserved
+    #  16-bit reserved field
+    #  @return [Integer]
+    define_attr :reserved, BinStruct::Int16le
+    # @!attribute tid
+    #  16-bit tree identifier (TID)
+    define_attr :tid, BinStruct::Int16le
+    # @!attribute pid
+    #  16 low order bits of a process identifier (PID)
+    #  @return [Integer]
+    define_attr :pid, BinStruct::Int16le
+    # @!attribute uid
+    #  16-bit user identifier (UID)
+    define_attr :uid, BinStruct::Int16le
+    # @!attribute mid
+    #  16-bit multiplex identifier (MID)
+    define_attr :mid, BinStruct::Int16le
+    # @!attribute body
+    #  @return [String]
+    define_attr :body, BinStruct::String
 
     # Helper to bind a SMB command to {SMB} header.
     # @param [String] command name
@@ -183,15 +175,13 @@ module PacketGen::Plugin
       super do |attr|
         case attr
         when :flags, :flags2
-          value = bits_on(attr).reject { |_, v| v > 1 }
-                               .keys
-                               .select { |b| send("#{b}?") }
+          value = bits_on(attr).select { |b| respond_to?("#{b}?") && send("#{b}?") }
                                .map(&:to_s)
                                .join(',')
                                .gsub!(/#{attr}_/, '')
           value = '%-16s (0x%02x)' % [value, self[attr].to_i]
           str = PacketGen::Inspect.shift_level
-          str << (PacketGen::Inspect::FMT_ATTR % [self[attr].class.to_s.sub(/.*::/, ''), attr, value])
+          str << (PacketGen::Inspect::FMT_ATTR % [self[attr].type_name, attr, value])
         end
       end
     end

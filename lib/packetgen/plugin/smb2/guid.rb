@@ -21,25 +21,25 @@ module PacketGen::Plugin
     #   |                                                               |
     #   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
     # @author Sylvain Daubert
-    class GUID < PacketGen::Types::Fields
-      include PacketGen::Types::Fieldable
+    class GUID < BinStruct::Struct
+      include BinStruct::Structable
 
       # @!attribute data1
       #  32-bit little-endian data1
       #  @return [Integer]
-      define_field :data1, PacketGen::Types::Int32le
+      define_attr :data1, BinStruct::Int32le
       # @!attribute data2
       #  16-bit little-endian data2
       #  @return [Integer]
-      define_field :data2, PacketGen::Types::Int16le
+      define_attr :data2, BinStruct::Int16le
       # @!attribute data3
       #  16-bit little-endian data3
       #  @return [Integer]
-      define_field :data3, PacketGen::Types::Int16le
+      define_attr :data3, BinStruct::Int16le
       # @!attribute data4
       #  64-bit big-endian data4
       #  @return [Integer]
-      define_field :data4, PacketGen::Types::Int64
+      define_attr :data4, BinStruct::Int64
 
       # Get a human-readable GUID, as specified in RFC 4122
       #   guid.to_human  # => "7aedb437-01b9-41d4-a5f7-9e6c06e16c8a"

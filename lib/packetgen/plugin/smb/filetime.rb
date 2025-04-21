@@ -10,7 +10,7 @@ module PacketGen::Plugin
     # SMB FILETIME.
     # @author Sylvain Daubert
     class Filetime
-      include PacketGen::Types::Fieldable
+      include BinStruct::Structable
 
       # Base time for SMB FILETIME.
       # This value also indicate no time.
@@ -37,7 +37,7 @@ module PacketGen::Plugin
       def initialize(options={})
         raise ArgumentError, ':time and :filetime options are both given' if options.key?(:time) && options.key?(:filetime)
 
-        @int = PacketGen::Types::SInt64le.new(options[:filetime])
+        @int = BinStruct::SInt64le.new(value: options[:filetime])
         if options[:time]
           @time = options[:time].getgm
           @int.value = time2filetime

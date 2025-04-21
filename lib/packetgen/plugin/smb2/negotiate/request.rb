@@ -53,23 +53,22 @@ module PacketGen::Plugin
         # @!attribute structure_size
         #  16-bit negotiate request structure size. Should be 36.
         #  @return [Integer]
-        define_field :structure_size, PacketGen::Types::Int16le, default: 36
+        define_attr :structure_size, BinStruct::Int16le, default: 36
         # @!attribute dialect_count
         #  16-bit number of dialects that are contained in {#dialects}.
         #  @return [Integer]
-        define_field :dialect_count, PacketGen::Types::Int16le
+        define_attr :dialect_count, BinStruct::Int16le
         # @!attribute security_mode
         #  16-bit security mode field.
         #  @return [Integer]
-        define_field :security_mode, PacketGen::Types::Int16leEnum, enum: SECURITY_MODES
+        define_attr :security_mode, BinStruct::Int16leEnum, enum: SECURITY_MODES
         # @!attribute reserved
         #  16-bit reserved field.
         #  @return [Integer]
-        define_field :reserved, PacketGen::Types::Int16le
+        define_attr :reserved, BinStruct::Int16le
         # @!attribute capabilities
         #  32-bit capabilities field.
         #  @return [Integer]
-        define_field :capabilities, PacketGen::Types::Int32le
         # @!attribute cap_encryption
         #  Indicates if encryption is supported
         #  @return [Boolean]
@@ -91,29 +90,29 @@ module PacketGen::Plugin
         # @!attribute cap_dfs
         #  Indicates if Distributed File system (DFS) is supported
         #  @return [Boolean]
-        define_bit_fields_on :capabilities,
-                             :cap_rsv, 25, :cap_encryption, :cap_dir_leasing,
-                             :cap_persistent_handles, :cap_multi_channel,
-                             :cap_large_mtu, :cap_leasing, :cap_dfs
+        define_bit_attr :capabilities, endian: :little,
+                                       cap_rsv: 25, cap_encryption: 1, cap_dir_leasing: 1,
+                                       cap_persistent_handles: 1, cap_multi_channel: 1,
+                                       cap_large_mtu: 1, cap_leasing: 1, cap_dfs: 1
         # @!attribute client_guid
         #  @return []
-        define_field :client_guid, GUID
+        define_attr :client_guid, GUID
         # @!attribute context_offset
         #  Only for SMB3 dialect.
         #  @return [Integer]
-        define_field :context_offset, PacketGen::Types::Int32le
+        define_attr :context_offset, BinStruct::Int32le
         # @!attribute context_count
         #  Only for SMB3 dialect.
         #  @return [Integer]
-        define_field :context_count, PacketGen::Types::Int16le
+        define_attr :context_count, BinStruct::Int16le
         # @!attribute reserved2
         #  Only for SMB3 dialect.
         #  @return [Integer]
-        define_field :reserved2, PacketGen::Types::Int16le
+        define_attr :reserved2, BinStruct::Int16le
         # @!attribute dialects
         #  Array of 16-bit integers specifying the supported dialtec revisions.
-        #  @return [Array<PacketGen::Types::Int16le>]
-        define_field :dialects, PacketGen::Types::ArrayOfInt16le, builder: ->(h, t) { t.new(counter: h[:dialect_count]) }
+        #  @return [Array<BinStruct::Int16le>]
+        define_attr :dialects, BinStruct::ArrayOfInt16le, builder: ->(h, t) { t.new(counter: h[:dialect_count]) }
         # @!attribute pad
         #  Optional padding between the end of the {#dialects} array and the first negotiate
         #  context in {#context_list} so that the first negotiate context is 8-byte aligned.
@@ -123,7 +122,7 @@ module PacketGen::Plugin
         #  If {#dialects} contains the value 0x0311, then this field must contain an array
         #  of {Context}
         #  @return [ArrayOfContext]
-        define_field :context_list, ArrayOfContext, builder: ->(h, t) { t.new(counter: h[:context_count]) }
+        define_attr :context_list, ArrayOfContext, builder: ->(h, t) { t.new(counter: h[:context_count]) }
 
         # Protocol name
         # @return [String]
@@ -136,9 +135,7 @@ module PacketGen::Plugin
           super do |attr|
             case attr
             when :capabilities
-              value = bits_on(attr).select { |_, v| v == 1 }
-                                   .keys
-                                   .select { |b| send("#{b}?") }
+              value = bits_on(attr).select { |b| respond_to?("#{b}?") && send("#{b}?") }
                                    .map { |v| v.to_s.delete_prefix('cap_') }
                                    .join(',')
               value = '%-16s (0x%08x)' % [value, self[attr].to_i]

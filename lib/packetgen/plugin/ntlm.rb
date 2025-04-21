@@ -8,7 +8,7 @@
 module PacketGen::Plugin
   # Base class for NTLM authentication protocol.
   # @author Sylvain Daubert
-  class NTLM < PacketGen::Types::Fields
+  class NTLM < BinStruct::Struct
     # NTLM message types
     TYPES = {
       'negotiate' => 1,
@@ -26,14 +26,14 @@ module PacketGen::Plugin
     # @!attribute signature
     #  8-byte NTLM signature
     #  @return [String]
-    define_field :signature, PacketGen::Types::String, static_length: 8, default: SIGNATURE
+    define_attr :signature, BinStruct::String, static_length: 8, default: SIGNATURE
     # @!attribute type
     #  4-byte message type
     #  @return [Integer]
-    define_field :type, PacketGen::Types::Int32leEnum, enum: TYPES
+    define_attr :type, BinStruct::Int32leEnum, enum: TYPES
     # @!attribute payload
     #  @return [String]
-    define_field :payload, PacketGen::Types::String
+    define_attr :payload, BinStruct::String
 
     class << self
       # @api private
@@ -56,15 +56,14 @@ module PacketGen::Plugin
       # Define a flags field.
       # @return [void]
       def define_negotiate_flags # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
-        define_field_before :payload, :flags, PacketGen::Types::Int32le
-        define_bit_fields_on :flags, :flags_w, :flags_v, :flags_u, :flags_r13, 3,
-                             :flags_t, :flags_r4, :flags_s, :flags_r,
-                             :flags_r5, :flags_q, :flags_p, :flags_r6,
-                             :flags_o, :flags_n, :flags_m, :flags_r7,
-                             :flags_l, :flags_k, :flags_j, :flags_r8,
-                             :flags_h, :flags_r9, :flags_g, :flags_f,
-                             :flags_e, :flags_d, :flags_r10, :flags_c,
-                             :flags_b, :flags_a
+        define_bit_attr_before :payload, :flags, endian: :little, flags_w: 1, flags_v: 1, flags_u: 1, flags_r13: 3,
+                                                 flags_t: 1, flags_r4: 1, flags_s: 1, flags_r: 1,
+                                                 flags_r5: 1, flags_q: 1, flags_p: 1, flags_r6: 1,
+                                                 flags_o: 1, flags_n: 1, flags_m: 1, flags_r7: 1,
+                                                 flags_l: 1, flags_k: 1, flags_j: 1, flags_r8: 1,
+                                                 flags_h: 1, flags_r9: 1, flags_g: 1, flags_f: 1,
+                                                 flags_e: 1, flags_d: 1, flags_r10: 1, flags_c: 1,
+                                                 flags_b: 1, flags_a: 1
         alias_method :nego56?, :flags_w?
         alias_method :key_exch?, :flags_v?
         alias_method :nego128?, :flags_u?
@@ -118,9 +117,9 @@ module PacketGen::Plugin
         @payload_fields ||= {}
         @payload_fields[name] = [type, options]
 
-        define_field_before :payload, :"#{name}_len", PacketGen::Types::Int16le
-        define_field_before :payload, :"#{name}_maxlen", PacketGen::Types::Int16le
-        define_field_before :payload, :"#{name}_offset", PacketGen::Types::Int32le
+        define_attr_before :payload, :"#{name}_len", BinStruct::Int16le
+        define_attr_before :payload, :"#{name}_maxlen", BinStruct::Int16le
+        define_attr_before :payload, :"#{name}_offset", BinStruct::Int32le
 
         attr_accessor name
       end

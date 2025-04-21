@@ -23,9 +23,9 @@ module PacketGen::Plugin
     }.freeze
 
     # AVPAIR structure, with value of type {SMB::String}.
-    AvPair = PacketGen::Types::AbstractTLV.create(type_class: PacketGen::Types::Int16leEnum,
-                                                  length_class: PacketGen::Types::Int16le,
-                                                  value_class: SMB::String)
+    AvPair = BinStruct::AbstractTLV.create(type_class: BinStruct::Int16leEnum,
+                                           length_class: BinStruct::Int16le,
+                                           value_class: SMB::String)
     AvPair.define_type_enum AVPAIR_TYPES
 
     class AvPair
@@ -36,30 +36,30 @@ module PacketGen::Plugin
     end
 
     # EOL AVPAIR structure, with no value
-    EOLAvPair = PacketGen::Types::AbstractTLV.create(type_class: PacketGen::Types::Int16leEnum,
-                                                     length_class: PacketGen::Types::Int16le)
+    EOLAvPair = BinStruct::AbstractTLV.create(type_class: BinStruct::Int16leEnum,
+                                              length_class: BinStruct::Int16le)
     EOLAvPair.define_type_enum AVPAIR_TYPES
 
     # Timestamp AVPAIR structure, with value of type {SMB::Filetime}.
-    TimestampAvPair = PacketGen::Types::AbstractTLV.create(type_class: PacketGen::Types::Int16leEnum,
-                                                           length_class: PacketGen::Types::Int16le,
-                                                           value_class: SMB::Filetime)
+    TimestampAvPair = BinStruct::AbstractTLV.create(type_class: BinStruct::Int16leEnum,
+                                                    length_class: BinStruct::Int16le,
+                                                    value_class: SMB::Filetime)
     TimestampAvPair.define_type_enum AVPAIR_TYPES
 
-    # Int32le AVPAIR structure, with value a {PacketGen::Types::Int32le}.
-    Int32leAvPair = PacketGen::Types::AbstractTLV.create(type_class: PacketGen::Types::Int16leEnum,
-                                                         length_class: PacketGen::Types::Int16le,
-                                                         value_class: PacketGen::Types::Int32le)
+    # Int32le AVPAIR structure, with value a {BinStruct::Int32le}.
+    Int32leAvPair = BinStruct::AbstractTLV.create(type_class: BinStruct::Int16leEnum,
+                                                  length_class: BinStruct::Int16le,
+                                                  value_class: BinStruct::Int32le)
     Int32leAvPair.define_type_enum AVPAIR_TYPES
 
-    # String AVPAIR structure, with value a {PacketGen::Types::String}.
-    StringAvPair = PacketGen::Types::AbstractTLV.create(type_class: PacketGen::Types::Int16leEnum,
-                                                        length_class: PacketGen::Types::Int16le,
-                                                        value_class: PacketGen::Types::String)
+    # String AVPAIR structure, with value a {BinStruct::String}.
+    StringAvPair = BinStruct::AbstractTLV.create(type_class: BinStruct::Int16leEnum,
+                                                 length_class: BinStruct::Int16le,
+                                                 value_class: BinStruct::String)
     StringAvPair.define_type_enum AVPAIR_TYPES
 
     # Specialized array containing {AvPair AvPairs}.
-    class ArrayOfAvPair < PacketGen::Types::Array
+    class ArrayOfAvPair < BinStruct::Array
       set_of AvPair
 
       # Get unicode property

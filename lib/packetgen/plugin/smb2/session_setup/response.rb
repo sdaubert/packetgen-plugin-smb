@@ -25,11 +25,10 @@ module PacketGen::Plugin
         # @!attribute structure_size
         #  16-bit session setup request structure size. Should be 9.
         #  @return [Integer]
-        define_field :structure_size, PacketGen::Types::Int16le, default: 9
+        define_attr :structure_size, BinStruct::Int16le, default: 9
         # @!attribute flags
         #  16-bit session flags
         #  @return [Integer]
-        define_field :flags, PacketGen::Types::Int16le
         # @!attribute flags_rsv
         #  13-bit reserved field
         #  @return [Integer]
@@ -39,18 +38,18 @@ module PacketGen::Plugin
         #  @return [Boolean]
         # @!attribute flags_is_guest?
         #  @return [Boolean]
-        define_bit_fields_on :flags, :flags_rsv, 13, :flags_encrypt_data, :flags_is_null, :flags_is_guest
+        define_bit_attr :flags, endian: :little, flags_rsv: 13, flags_encrypt_data: 1, lags_is_null: 1, flags_is_guest: 1
         # @!attribute buffer_offset
         #  The offset, from the beginning of the SMB2 header of the {#buffer}.
         #  @return [Integer]
-        define_field :buffer_offset, PacketGen::Types::Int16le, default: SMB2::HEADER_SIZE + 8
+        define_attr :buffer_offset, BinStruct::Int16le, default: SMB2::HEADER_SIZE + 8
         # @!attribute buffer_length
         #  The length of the {#buffer} field.
         #  @return [Integer]
-        define_field :buffer_length, PacketGen::Types::Int16le
+        define_attr :buffer_length, BinStruct::Int16le
         # @!attribute buffer
         #  @return [GSSAPI]
-        define_field :buffer, GSSAPI, token: :response, optional: ->(h) { h.buffer_offset.positive? }
+        define_attr :buffer, GSSAPI, token: :response, optional: ->(h) { h.buffer_offset.positive? }
 
         # Calculate and set {#buffer_length} and {#buffer_offset} fields.
         # @return [void]

@@ -18,12 +18,12 @@ module PacketGen::Plugin
         #  The size, in 2-byte words, of the SMB command parameters. It should
         #  be +0+.
         #  @return [Integer]
-        define_field :word_count, PacketGen::Types::Int8, default: 3
-        define_field :last_modified, PacketGen::Types::Int32le
+        define_attr :word_count, BinStruct::Int8, default: 3
+        define_attr :last_modified, BinStruct::Int32le
         # @!attribute byte_count
         #  Should be 0.
         #  @return [Integer]
-        define_field :byte_count, PacketGen::Types::Int16le, default: 0
+        define_attr :byte_count, BinStruct::Int16le, default: 0
 
         # Give protocol name for this class
         # @return [String]

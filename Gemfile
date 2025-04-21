@@ -5,6 +5,7 @@ source 'https://rubygems.org'
 gemspec
 
 gem 'bundler', '>=1.17', '<3'
+gem 'rake', '~>13.0', require: false
 gem 'rspec', '~>3.13'
 
 group :noci do

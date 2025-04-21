@@ -21,7 +21,7 @@ module PacketGen::Plugin
       #   |                              ...                              |
       #   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
       # @author Sylvain Daubert
-      class Context < PacketGen::Types::Fields
+      class Context < BinStruct::Struct
         # Known types
         TYPES = {
           'PREAUTH_INTEGRITY_CAP' => 1,
@@ -31,23 +31,23 @@ module PacketGen::Plugin
         # @!attribute type
         #  16-bit context type
         #  @return [Integer]
-        define_field :type, PacketGen::Types::Int16leEnum, enum: TYPES
+        define_attr :type, BinStruct::Int16leEnum, enum: TYPES
         # @!attribute data_length
         #  16-bit data length
         #  @return [Integer]
-        define_field :data_length, PacketGen::Types::Int16le
+        define_attr :data_length, BinStruct::Int16le
         # @!attribute reserved
         #  32-bit reserved field
         #  @return [Integer]
-        define_field :reserved, PacketGen::Types::Int32le
+        define_attr :reserved, BinStruct::Int32le
         # @!attribute data
         #  context data
         #  @return [String]
-        define_field :data, PacketGen::Types::String, builder: ->(h, t) { t.new(length_from: h[:data_length]) }
+        define_attr :data, BinStruct::String, builder: ->(h, t) { t.new(length_from: h[:data_length]) }
         # @!attribute pad
         #  Padding to align next context on a 8-byte offset
         #  @return [String]
-        define_field :pad, PacketGen::Types::String, builder: ->(h, t) { t.new(length_from: -> { 8 - ((h.offset_of(:data) + h.data_length) % 8) }) }
+        define_attr :pad, BinStruct::String, builder: ->(h, t) { t.new(length_from: -> { 8 - ((h.offset_of(:data) + h.data_length) % 8) }) }
 
         # @private
         alias old_read read
@@ -74,45 +74,45 @@ module PacketGen::Plugin
 
       # Specialized {Context} for PREAUTH_INTEGRITY_CAP type.
       class PreauthIntegrityCap < Context
-        remove_field :data
+        remove_attr :data
         # @!attribute hash_alg_count
         #  16-bit number of hash algorithm in {#hash_alg}
         #  @return [Integer]
-        define_field_before :pad, :hash_alg_count, PacketGen::Types::Int16le
+        define_attr_before :pad, :hash_alg_count, BinStruct::Int16le
         # @!attribute salt_length
         #  16-bit length of {#salt} field, in bytes.
         #  @return [Integer]
-        define_field_before :pad, :salt_length, PacketGen::Types::Int16le
+        define_attr_before :pad, :salt_length, BinStruct::Int16le
         # @!attribute hash_alg
         #  Array of 16-bit integer IDs specifying the supported preauthentication
         #  hash algorithms
-        #  @return [PacketGen::Types::ArrayOfInt16le]
-        define_field_before :pad, :hash_alg, PacketGen::Types::ArrayOfInt16le, builder: ->(h, t) { t.new(counter: h[:hash_alg_count]) }
+        #  @return [BinStruct::ArrayOfInt16le]
+        define_attr_before :pad, :hash_alg, BinStruct::ArrayOfInt16le, builder: ->(h, t) { t.new(counter: h[:hash_alg_count]) }
         # @!attribute salt
         #  Salt value for hash
         #  @return [String]
-        define_field_before :pad, :salt, PacketGen::Types::String, builder: ->(h, t) { t.new(length_from: h[:salt_length]) }
-        update_field :pad, builder: ->(h, t) { t.new(length_from: -> { (8 - ((h.offset_of(:salt) + h.salt_length) % 8)) }) }
+        define_attr_before :pad, :salt, BinStruct::String, builder: ->(h, t) { t.new(length_from: h[:salt_length]) }
+        update_attr :pad, builder: ->(h, t) { t.new(length_from: -> { (8 - ((h.offset_of(:salt) + h.salt_length) % 8)) }) }
       end
 
       # Specialized {Context} for ENCRYPTION_CAP type.
       class EncryptionCap < Context
-        remove_field :data
+        remove_attr :data
         # @!attribute cipher_count
         #  16-bit number of cipher algorithm in {#ciphers}
         #  @return [Integer]
-        define_field_before :pad, :cipher_count, PacketGen::Types::Int16le
+        define_attr_before :pad, :cipher_count, BinStruct::Int16le
         # @!attribute ciphers
         #  Array of 16-bit integer IDs specifying the supported encryption
         #  algorithms
-        #  @return [PacketGen::Types::ArrayOfInt16le]
-        define_field_before :pad, :ciphers, PacketGen::Types::ArrayOfInt16le, builder: ->(h, t) { t.new(counter: h[:cipher_count]) }
-        update_field :pad, builder: ->(h, t) { t.new(length_from: -> { (8 - ((h.offset_of(:cipher_count) + h[:cipher_count].sz) % 8)) % 8 }) }
+        #  @return [BinStruct::ArrayOfInt16le]
+        define_attr_before :pad, :ciphers, BinStruct::ArrayOfInt16le, builder: ->(h, t) { t.new(counter: h[:cipher_count]) }
+        update_attr :pad, builder: ->(h, t) { t.new(length_from: -> { (8 - ((h.offset_of(:cipher_count) + h[:cipher_count].sz) % 8)) % 8 }) }
       end
 
       # Array of {Context}
       # @author Sylvain Daubert
-      class ArrayOfContext < PacketGen::Types::Array
+      class ArrayOfContext < BinStruct::Array
         set_of Context
 
         private

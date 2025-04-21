@@ -14,7 +14,7 @@ module PacketGen::Plugin
       # announce the machine group it serves.
       # @author Sylvain Daubert
       class DomainAnnouncement < HostAnnouncement
-        update_field :opcode, default: 12
+        update_attr :opcode, default: 12
 
         alias browser_conf_ver_maj os_ver_maj
         alias browser_conf_ver_min os_ver_min
