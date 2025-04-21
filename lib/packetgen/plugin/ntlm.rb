@@ -93,7 +93,7 @@ module PacketGen::Plugin
         class_eval do
           def flags_a=(value)
             self.old_flags_a = value
-            self.class.payload_fields.each do |name, _|
+            self.class.payload_fields.each_key do |name|
               attr = send(name)
               attr.unicode = value if attr.respond_to?(:unicode=)
             end
@@ -174,7 +174,7 @@ module PacketGen::Plugin
       return self if self.class.payload_fields.nil?
 
       previous_len = 0
-      self.class.payload_fields.each do |name, _type_and_opt|
+      self.class.payload_fields.each_key do |name|
         send(:"#{name}_len=", 0)
         send(:"#{name}_offset=", offset_of(:payload) + previous_len)
 
@@ -194,7 +194,7 @@ module PacketGen::Plugin
       s = super
       return s if self.class.payload_fields.nil?
 
-      self.class.payload_fields.each do |name, _type_and_opt|
+      self.class.payload_fields.each_key do |name|
         attr = send(name)
         attr.unicode = unicode? if attr.respond_to?(:unicode=)
         s << attr.to_s unless attr.nil? || send("#{name}_len").zero?

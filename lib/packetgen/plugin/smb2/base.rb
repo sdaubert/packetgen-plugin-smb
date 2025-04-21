@@ -19,7 +19,7 @@ module PacketGen::Plugin
       def self.define_smb2_pad_field(name)
         prev_field = self.fields.last
         lf = lambda do |hdr|
-          (8 - (hdr.offset_of(prev_field) + hdr[prev_field].sz) % 8) % 8
+          (8 - ((hdr.offset_of(prev_field) + hdr[prev_field].sz) % 8)) % 8
         end
         define_field name, PacketGen::Types::String, default: SMB2::MAX_PADDING,
                                                      builder: ->(h, t) { t.new(length_from: -> { lf[h] }) }

@@ -89,12 +89,12 @@ module PacketGen::Plugin
     #  32-bit reserved field.
     #  Only present for synchronous messages.
     #  @return [Integer]
-    define_field :reserved, PacketGen::Types::Int32le, optional: ->(h) { (h.flags & 2).zero? }
+    define_field :reserved, PacketGen::Types::Int32le, optional: ->(h) { h.flags.nobits?(2) }
     # @!attribute tree_id
     #  32-bit integer that uniquely identifies the tree connect for the command.
     #  Only present for synchronous messages.
     #  @return [Integer]
-    define_field :tree_id, PacketGen::Types::Int32le, optional: ->(h) { (h.flags & 2).zero? }
+    define_field :tree_id, PacketGen::Types::Int32le, optional: ->(h) { h.flags.nobits?(2) }
     # @!attribute session_id
     #  64-bit integer that uniquely identifies the established session for the command.
     #  @return [Integer]
@@ -147,7 +147,7 @@ module PacketGen::Plugin
       krequest = self.const_get("#{contantized}::Request")
       kresponse = self.const_get("#{contantized}::Response")
       PacketGen::Header.add_class krequest
-      self.bind krequest, command: SMB2::COMMANDS[command], flags: ->(v) { v.nil? ? 0 : (v & 1).zero? }
+      self.bind krequest, command: SMB2::COMMANDS[command], flags: ->(v) { v.nil? ? 0 : v.nobits?(1) }
       PacketGen::Header.add_class kresponse
       self.bind kresponse, command: SMB2::COMMANDS[command], flags: ->(v) { v.nil? ? 1 : (v & 1 == 1) }
     end

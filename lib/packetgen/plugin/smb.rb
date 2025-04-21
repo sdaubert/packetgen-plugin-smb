@@ -167,7 +167,7 @@ module PacketGen::Plugin
       krequest = self.const_get("#{contantized}::Request")
       kresponse = self.const_get("#{contantized}::Response")
       PacketGen::Header.add_class krequest
-      self.bind krequest, command: SMB::COMMANDS[command], flags: ->(v) { v.nil? ? 0 : (v & 0x80).zero? }
+      self.bind krequest, command: SMB::COMMANDS[command], flags: ->(v) { v.nil? ? 0 : v.nobits?(0x80) }
       PacketGen::Header.add_class kresponse
       self.bind kresponse, command: SMB::COMMANDS[command], flags: ->(v) { v.nil? ? 0 : (v & 0x80 == 0x80) }
     end

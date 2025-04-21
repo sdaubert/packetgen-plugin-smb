@@ -62,7 +62,7 @@ module PacketGen::Plugin
         self.data1 = values[0]
         self.data2 = values[1]
         self.data3 = values[2]
-        self.data4 = values[3] << 48 | values[4]
+        self.data4 = (values[3] << 48) | values[4]
         self
       end
     end

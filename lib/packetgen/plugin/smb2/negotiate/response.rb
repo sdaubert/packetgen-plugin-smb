@@ -170,7 +170,7 @@ module PacketGen::Plugin
                                  .select { |b| send("#{b}?") }
                                  .map(&:to_s)
                                  .join(',')
-                                 .gsub!(/cap_/, '')
+                                 .gsub!('cap_', '')
             value = '%-16s (0x%08x)' % [value, self[attr].to_i]
             str = PacketGen::Inspect.shift_level
             str << (PacketGen::Inspect::FMT_ATTR % [self[attr].class.to_s.sub(/.*::/, ''), attr, value])

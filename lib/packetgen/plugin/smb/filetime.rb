@@ -121,7 +121,7 @@ module PacketGen::Plugin
       def time2filetime
         # Time#to_f then #to_r is more precise than Time#to_r
         # (ie Time#to_r sometimes does a rounding error).
-        (@time.to_i - NO_TIME.to_i) * ONE_SEC + ((@time.to_f.to_r * ONE_SEC) % ONE_SEC).to_i
+        ((@time.to_i - NO_TIME.to_i) * ONE_SEC) + ((@time.to_f.to_r * ONE_SEC) % ONE_SEC).to_i
       end
     end
   end

@@ -128,7 +128,7 @@ module PacketGen::Plugin
         #  Padding before {#filename} to align it on 16-bit boundary. Only present
         #  if {SMB#flags2_unicode?} is +true+.
         #  @return [Integer]
-        define_field :pad1, PacketGen::Types::Int8, optional: ->(h) { h&.packet&.smb&.flags2_unicode? }
+        define_field :pad1, PacketGen::Types::Int8, optional: ->(h) { h&.packet&.smb&.flags2_unicode? } # rubocop:disable Style/SafeNavigationChainLength
         # @!attribute filename
         #  A string that represents the fully qualified name of the file
         #  relative to the supplied TID

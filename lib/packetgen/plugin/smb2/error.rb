@@ -45,5 +45,5 @@ module PacketGen::Plugin
     end
   end
   PacketGen::Header.add_class SMB2::ErrorResponse
-  SMB2.bind SMB2::ErrorResponse, status: ->(v) { v.positive? }
+  SMB2.bind SMB2::ErrorResponse, status: lambda(&:positive?)
 end
