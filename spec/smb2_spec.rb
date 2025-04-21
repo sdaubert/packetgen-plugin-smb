@@ -92,7 +92,7 @@ module PacketGen::Plugin
         expect(pkt.smb2.reserved).to eq(0)
         expect(pkt.smb2.tree_id).to eq(5)
         expect(pkt.smb2.session_id).to eq(0x840000000049)
-        sig = force_binary("\xa9\xa6\xd1\xa8\x0d\x7d\x0a\xba\x11\xd2\xcd\x79\x90\x7f\xe6\x86")
+        sig = "\xa9\xa6\xd1\xa8\x0d\x7d\x0a\xba\x11\xd2\xcd\x79\x90\x7f\xe6\x86".b
         expect(pkt.smb2.signature).to eq(sig)
       end
     end
@@ -102,13 +102,13 @@ module PacketGen::Plugin
 
       it 'puts a line for each attribute but body' do
         str = smb2.inspect
-        (smb2.fields - %i[body async_id]).each do |field|
+        (smb2.attributes - %i[body async_id]).each do |field|
           expect(str).to include(field.to_s)
         end
 
         smb2 = SMB2.new(flags_async: true)
         str = smb2.inspect
-        (smb2.fields - %i[body reserved tree_id]).each do |field|
+        (smb2.attributes - %i[body reserved tree_id]).each do |field|
           expect(str).to include(field.to_s)
         end
       end

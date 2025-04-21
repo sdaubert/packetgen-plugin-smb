@@ -35,48 +35,10 @@ module PacketGen::Plugin
       # @!attribute type
       #  8-bit session packet type
       #  @return [Integer]
-      define_field :type, PacketGen::Types::Int8Enum, enum: TYPES
+      define_attr :type, BinStruct::Int8Enum, enum: TYPES
       # @!attribute flags
       #  8-bit flags
       #  @return [Integer]
-      define_field :flags, PacketGen::Types::Int8
-      # @!attribute dgm_id
-      #  16-bit next transaction ID for datagrams
-      #  @return [Integer]
-      define_field :dgm_id, PacketGen::Types::Int16
-      # @!attribute src_ip
-      #  Source IP address
-      # @return [IP::Addr]
-      define_field :src_ip, PacketGen::Header::IP::Addr
-      # @!attribute src_port
-      #  Source port
-      # @return [IP::Addr]
-      define_field :src_port, PacketGen::Types::Int16
-      # @!attribute dgm_length
-      #  Length of data + second level of encoded names. Not present in error datagram.
-      # @return [Integer]
-      define_field :dgm_length, PacketGen::Types::Int16, optional: ->(h) { h.type != 0x13 }
-      # @!attribute packet_offset
-      # Not present in error datagram.
-      # @return [Integer]
-      define_field :packet_offset, PacketGen::Types::Int16, optional: ->(h) { h.type != 0x13 }
-      # @!attribute error_code
-      #  Error code. Only present in error datagrams.
-      #  @return [Integer]
-      define_field :error_code, PacketGen::Types::Int16, optional: ->(h) { h.type == 0x13 }
-      # @!attribute src_name
-      #  NetBIOS source name. Only present in direct_unique, direct_group and broadcast datagrams.
-      #  @return []
-      define_field :src_name, Name, default: '', optional: ->(h) { (h.type >= 0x10) && (h.type <= 0x12) }
-      # @!attribute dst_name
-      #  NetBIOS destination name. Present in all but error datagrams.
-      #  @return []
-      define_field :dst_name, Name, default: '', optional: ->(h) { h.type != 0x13 }
-      # @!attribute body
-      #  User data. Ony present in direct_unique, direct_group and broadcast datagrams.
-      #  @return [String]
-      define_field :body, PacketGen::Types::String, optional: ->(h) { (h.type >= 0x10) && (h.type <= 0x12) }
-
       # @!attribute :rsv
       #  4-bit rsv field. 4 upper bits of {#flags}
       #  @return [Integer]
@@ -91,7 +53,43 @@ module PacketGen::Plugin
       #  More flag. If set then more NetBIOS datagram
       #  fragments follow.
       #  @return [Boolean]
-      define_bit_fields_on :flags, :rsv, 4, :snt, 2, :f, :m
+      define_bit_attr :flags, rsv: 4, snt: 2, f: 1, m: 1
+      # @!attribute dgm_id
+      #  16-bit next transaction ID for datagrams
+      #  @return [Integer]
+      define_attr :dgm_id, BinStruct::Int16
+      # @!attribute src_ip
+      #  Source IP address
+      # @return [IP::Addr]
+      define_attr :src_ip, PacketGen::Header::IP::Addr
+      # @!attribute src_port
+      #  Source port
+      # @return [IP::Addr]
+      define_attr :src_port, BinStruct::Int16
+      # @!attribute dgm_length
+      #  Length of data + second level of encoded names. Not present in error datagram.
+      # @return [Integer]
+      define_attr :dgm_length, BinStruct::Int16, optional: ->(h) { h.type != 0x13 }
+      # @!attribute packet_offset
+      # Not present in error datagram.
+      # @return [Integer]
+      define_attr :packet_offset, BinStruct::Int16, optional: ->(h) { h.type != 0x13 }
+      # @!attribute error_code
+      #  Error code. Only present in error datagrams.
+      #  @return [Integer]
+      define_attr :error_code, BinStruct::Int16, optional: ->(h) { h.type == 0x13 }
+      # @!attribute src_name
+      #  NetBIOS source name. Only present in direct_unique, direct_group and broadcast datagrams.
+      #  @return []
+      define_attr :src_name, Name, default: '', optional: ->(h) { (h.type >= 0x10) && (h.type <= 0x12) }
+      # @!attribute dst_name
+      #  NetBIOS destination name. Present in all but error datagrams.
+      #  @return []
+      define_attr :dst_name, Name, default: '', optional: ->(h) { h.type != 0x13 }
+      # @!attribute body
+      #  User data. Ony present in direct_unique, direct_group and broadcast datagrams.
+      #  @return [String]
+      define_attr :body, BinStruct::String, optional: ->(h) { (h.type >= 0x10) && (h.type <= 0x12) }
 
       # Compute and set {#dgm_length} field
       # @return [Integer] calculated length

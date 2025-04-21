@@ -33,10 +33,10 @@ module PacketGen::Plugin
       # @!attribute opcode
       #  8-bit opcode
       #  @return [Integer]
-      define_field :opcode, PacketGen::Types::Int8Enum, enum: OPCODES
+      define_attr :opcode, BinStruct::Int8Enum, enum: OPCODES
       # @!attribute body
       #  @return [String]
-      define_field :body, PacketGen::Types::String
+      define_attr :body, BinStruct::String
 
       alias old_read read
       private :old_read
@@ -49,7 +49,7 @@ module PacketGen::Plugin
         if self.instance_of?(Browser)
           return self if str.nil?
 
-          PacketGen.force_binary str
+          str = str.b
           self[:opcode].read str[0]
 
           opcode_klass = Browser.const_get(self[:opcode].to_human) if Browser.const_defined?(self[:opcode].to_human)

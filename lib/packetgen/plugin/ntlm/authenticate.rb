@@ -13,12 +13,12 @@ module PacketGen::Plugin
       # void MIC
       VOID_MIC = ([0] * 16).pack('C').freeze
 
-      update_field :type, default: NTLM::TYPES['authenticate']
+      update_attr :type, default: NTLM::TYPES['authenticate']
 
       # @!attribute lm_response
       #   A LM_RESPONSE or LMV2_RESPONSE structure that contains the computed
       #   LM response to the challenge.
-      #   @return [PacketGen::Types::String]
+      #   @return [BinStruct::String]
       # @!attribute lm_response_len
       #   16-bit unsigned integer that defines the size in bytes of
       #   {#lm_response} in {#payload}.
@@ -30,7 +30,7 @@ module PacketGen::Plugin
       #   A 32-bit unsigned integer that defines the offset, in bytes, from
       #   the beginning of the AUTHENTICATE MESSAGE to {#lm_response} in {#payload}.
       #   @return [Integer]
-      define_in_payload :lm_response, PacketGen::Types::String
+      define_in_payload :lm_response, BinStruct::String
 
       # @!attribute nt_response
       #   A NTLM_RESPONSE or NTLMV2_RESPONSE structure that contains the computed
@@ -96,7 +96,7 @@ module PacketGen::Plugin
 
       # @!attribute session_key
       #  The client's encrypted random session key. On
-      #  @return [PacketGen::Types::String]
+      #  @return [BinStruct::String]
       # @!attribute session_key_len
       #  2-byte {#session_key} length
       #  @return [Integer]
@@ -107,7 +107,7 @@ module PacketGen::Plugin
       #  4-byte {#session_key} offset from  the beginning of the AUTHENTICATE
       #  MESSAGE in {#payload}.
       #  @return [Integer]
-      define_in_payload :session_key, PacketGen::Types::String
+      define_in_payload :session_key, BinStruct::String
 
       # @!attribute flags
       #   Negotiate flags
@@ -186,12 +186,12 @@ module PacketGen::Plugin
       # @!attribute version
       #  8-byte version information
       #  @return [String]
-      define_field_before :payload, :version, PacketGen::Types::String, static_length: 8, default: VOID_VERSION
+      define_attr_before :payload, :version, BinStruct::String, static_length: 8, default: VOID_VERSION
 
       # @!attribute mic
       #  16-byte message integrity code
       #  @return [String]
-      define_field_before :payload, :mic, PacketGen::Types::String, static_length: 16, default: VOID_MIC
+      define_attr_before :payload, :mic, BinStruct::String, static_length: 16, default: VOID_MIC
     end
   end
 end

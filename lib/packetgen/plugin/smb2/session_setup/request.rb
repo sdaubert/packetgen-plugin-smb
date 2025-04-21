@@ -36,50 +36,48 @@ module PacketGen::Plugin
         # @!attribute structure_size
         #  16-bit session setup request structure size. Should be 25.
         #  @return [Integer]
-        define_field :structure_size, PacketGen::Types::Int16le, default: 25
+        define_attr :structure_size, BinStruct::Int16le, default: 25
         # @!attribute flags
         #  8-bit flags for SMB 3 dialect.
         #  @return [Integer]
-        define_field :flags, PacketGen::Types::Int8
         # @!attribute flags_rsv
         #  @return [Integer]
         # @!attribute flags_binding?
         #  @return [Boolean]
-        define_bit_fields_on :flags, :flags_rsv, 7, :flags_binding
+        define_bit_attr :flags, flags_rsv: 7, flags_binding: 1
         # @!attribute security_mode
         #  16-bit security mode field.
         #  @return [Integer]
-        define_field :security_mode, PacketGen::Types::Int8Enum, enum: SECURITY_MODES
+        define_attr :security_mode, BinStruct::Int8Enum, enum: SECURITY_MODES
         # @!attribute capabilities
         #  32-bit capabilities field.
         #  @return [Integer]
-        define_field :capabilities, PacketGen::Types::Int32le
         # @!attribute cap_rsv
         #  31-bit reserved field
         #  @return [Boolean]
         # @!attribute cap_dfs
         #  Indicates if Distributed File system (DFS) is supported
         #  @return [Boolean]
-        define_bit_fields_on :capabilities, :cap_rsv, 31, :cap_dfs
+        define_bit_attr :capabilities, endian: :little, cap_rsv: 31, cap_dfs: 1
         # @!attribute channel
         #  32-bit reserved field
         #  @return [Integer]
-        define_field :channel, PacketGen::Types::Int32le
+        define_attr :channel, BinStruct::Int32le
         # @!attribute buffer_offset
         #  The offset, from the beginning of the SMB2 header of the {#buffer}.
         #  @return [Integer]
-        define_field :buffer_offset, PacketGen::Types::Int16le, default: SMB2::HEADER_SIZE + (6 * 4)
+        define_attr :buffer_offset, BinStruct::Int16le, default: SMB2::HEADER_SIZE + (6 * 4)
         # @!attribute buffer_length
         #  The length of the {#buffer} field.
         #  @return [Integer]
-        define_field :buffer_length, PacketGen::Types::Int16le
+        define_attr :buffer_length, BinStruct::Int16le
         # @!attribute prev_session_id
         #  64-bit previously established session id
         #  @return [Integer]
-        define_field :prev_session_id, PacketGen::Types::Int64le
+        define_attr :prev_session_id, BinStruct::Int64le
         # @!attribute buffer
         #  @return [GSSAPI]
-        define_field :buffer, GSSAPI, token: :response, optional: ->(h) { h.buffer_offset.positive? }
+        define_attr :buffer, GSSAPI, token: :response, optional: ->(h) { h.buffer_offset.positive? }
 
         # Calculate and set {#buffer_length} and {#buffer_offset} fields.
         # @return [void]

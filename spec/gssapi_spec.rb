@@ -29,7 +29,7 @@ module PacketGen::Plugin
       expect(gssapi[:init_env][:token_init][:mech_types][2].value).to eq('1.2.840.113554.1.2.2')
       expect(gssapi[:init_env][:token_init][:mech_types][3].value).to eq('1.2.840.113554.1.2.2.3')
       expect(gssapi[:init_env][:token_init][:mech_types][4].value).to eq('1.3.6.1.4.1.311.2.2.10')
-      str = force_binary("\xA3\e0\x19\xA0\x17\e\x15Server2008@SMB3.local")
+      str = "\xA3\e0\x19\xA0\x17\e\x15Server2008@SMB3.local".b
       expect(gssapi[:init_env][:token_init][:mech_list_mic].value).to eq(str)
     end
 

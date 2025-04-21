@@ -28,7 +28,7 @@ Credentials = Struct.new(:user, :computer, :challenge, :proof, :response, :ip) d
   def to_s
     user = self.user.encode('UTF-8')
     computer = self.computer.encode('UTF-8')
-    str = +"User: #{user}\nComputer:#{computer} (IP: #{ip})\n"
+    str = "User: #{user}\nComputer:#{computer} (IP: #{ip})\n"
     str << "Challenge: #{challenge}\nProof: #{proof}\n"
     str << "Response: #{response}"
   end
@@ -77,7 +77,7 @@ class Smb2Responder
                                max_trans_size: SMB2_SIZE,
                                max_read_size: SMB2_SIZE,
                                max_write_size: SMB2_SIZE)
-    @resp1_pkt.smb2_negotiate_response[:buffer] = PacketGen::Types::String.new.read(SMB2_NEGO_RESP_BUFFER)
+    @resp1_pkt.smb2_negotiate_response[:buffer] = BinStruct::String.new.read(SMB2_NEGO_RESP_BUFFER)
     @resp1_pkt.calc
     @resp1_pkt
   end
@@ -105,13 +105,13 @@ class Smb2Responder
                         max_read_size: SMB2_SIZE,
                         max_write_size: SMB2_SIZE,
                         system_time: PacketGen::Plugin::SMB::Filetime.now,
-                        buffer: PacketGen::Types::String.new.read(SMB2_NEGO_RESP_BUFFER))
+                        buffer: BinStruct::String.new.read(SMB2_NEGO_RESP_BUFFER))
 
     pkt.smb2_negotiate_response.context_list << { type: 1, salt_length: SMB2_SALT_LEN, salt: salt }
-    pkt.smb2_negotiate_response.context_list.last.hash_alg << PacketGen::Types::Int16le.new(1)
+    pkt.smb2_negotiate_response.context_list.last.hash_alg << BinStruct::Int16le.new(value: 1)
 
     pkt.smb2_negotiate_response.context_list << { type: 2 }
-    pkt.smb2_negotiate_response.context_list.last.ciphers << PacketGen::Types::Int16le.new(1)
+    pkt.smb2_negotiate_response.context_list.last.ciphers << BinStruct::Int16le.new(value: 1)
     pkt.calc
     pkt
   end
@@ -165,7 +165,7 @@ class Smb2Responder
                         reserved: smb2_req.reserved)
                    .add('SMB2::SessionSetup::Response')
     # Remove buffer
-    pkt.smb2_sessionsetup_response[:buffer] = PacketGen::Types::String.new
+    pkt.smb2_sessionsetup_response[:buffer] = BinStruct::String.new
     pkt.calc
     pkt
   end
@@ -220,13 +220,13 @@ class Smb2Responder
         client.send(pkt_to_send.to_s, 0) if pkt_to_send
         client.close if to_close
 
-        puts credentials.to_s unless credentials.response.nil?
+        puts credentials unless credentials.response.nil?
       end
     end
   end
 
   def binary2hex(str)
-    str.unpack('H*').first
+    str.unpack1('H*')
   end
 end
 

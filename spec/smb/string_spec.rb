@@ -100,23 +100,23 @@ module PacketGen::Plugin
           it 'does set a null-byte if string is not null-terminated' do
             s = String.new(null_terminated: false)
             s.read('abcd'.force_encoding('BINARY'))
-            expect(s.to_s).to eq(force_binary('abcd'))
+            expect(s.to_s).to eq('abcd'.b)
 
             s.read(utf16le("abcd\x00"))
-            expect(s.to_s).to eq(force_binary(utf16le('abcd')))
+            expect(s.to_s).to eq(utf16le('abcd').b)
             s.read(utf16le("abcd\x00").force_encoding('BINARY'))
-            expect(s.to_s).to eq(force_binary(utf16le('abcd')))
+            expect(s.to_s).to eq(utf16le('abcd').b)
           end
 
           it 'sets a null terminator if strinf is null-terminated' do
             s = String.new(null_terminated: true)
             s.read('abcd'.force_encoding('BINARY'))
-            expect(s.to_s).to eq(force_binary("abcd\x00\x00"))
+            expect(s.to_s).to eq("abcd\x00\x00".b)
             s.read(utf16le('abcd'))
-            expect(s.to_s).to eq(force_binary(utf16le("abcd\x00")))
+            expect(s.to_s).to eq(utf16le("abcd\x00").b)
 
             s.read(utf16le("abcd\x00").force_encoding('BINARY'))
-            expect(s.to_s).to eq(force_binary(utf16le("abcd\x00")))
+            expect(s.to_s).to eq(utf16le("abcd\x00").b)
           end
         end
       end

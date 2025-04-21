@@ -54,7 +54,7 @@ module PacketGen::Plugin
       describe '#calc_length' do
         let(:req) do
           rq = SessionSetup::Request.new
-          rq[:buffer] = PacketGen::Types::String.new
+          rq[:buffer] = BinStruct::String.new
           rq
         end
 
@@ -93,7 +93,7 @@ module PacketGen::Plugin
       describe '#calc_length' do
         let(:resp) do
           rp = SessionSetup::Response.new
-          rp[:buffer] = PacketGen::Types::String.new
+          rp[:buffer] = BinStruct::String.new
           rp
         end
 

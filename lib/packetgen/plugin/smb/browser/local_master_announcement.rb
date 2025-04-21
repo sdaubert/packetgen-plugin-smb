@@ -14,7 +14,7 @@ module PacketGen::Plugin
       # advertise its presence.
       # @author Sylvain Daubert
       class LocalMasterAnnouncement < HostAnnouncement
-        update_field :opcode, default: 15
+        update_attr :opcode, default: 15
       end
       PacketGen::Header.add_class LocalMasterAnnouncement
       SMB::Trans::Request.bind LocalMasterAnnouncement, name: '\\MAILSLOT\\BROWSE', body: ->(v) { v[0] == OPCODES['LocalMasterAnnouncement'] }

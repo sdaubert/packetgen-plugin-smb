@@ -10,7 +10,7 @@ module PacketGen::Plugin
     # NTLM Challenge message
     # @author Sylvain Daubert
     class Challenge < NTLM
-      update_field :type, default: NTLM::TYPES['challenge']
+      update_attr :type, default: NTLM::TYPES['challenge']
 
       # @!attribute target_name
       #   Name of the server authentication realm. Must be expressed in the
@@ -108,11 +108,11 @@ module PacketGen::Plugin
       # @!attribute challenge
       #   64-bit value containing the NTLM challenge.
       #   @return [String]
-      define_field_before :payload, :challenge, PacketGen::Types::String, static_length: 8, default: VOID_CHALLENGE
+      define_attr_before :payload, :challenge, BinStruct::String, static_length: 8, default: VOID_CHALLENGE
       # @!attribute reserved
       #   64-bit reserved field
       #   @return [Integer]
-      define_field_before :payload, :reserved, PacketGen::Types::Int64le
+      define_attr_before :payload, :reserved, BinStruct::Int64le
 
       # @!attribute target_info
       #   @return [ArrayOfAvPair]
@@ -134,7 +134,7 @@ module PacketGen::Plugin
       # @!attribute version
       #  8-byte version information
       #  @return [String]
-      define_field_before :payload, :version, PacketGen::Types::String, static_length: 8, default: VOID_VERSION
+      define_attr_before :payload, :version, BinStruct::String, static_length: 8, default: VOID_VERSION
     end
   end
 end

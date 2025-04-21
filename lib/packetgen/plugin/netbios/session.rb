@@ -36,14 +36,14 @@ module PacketGen::Plugin
       # @!attribute type
       #  8-bit session packet type
       #  @return [Integer]
-      define_field :type, PacketGen::Types::Int8Enum, enum: TYPES
+      define_attr :type, BinStruct::Int8Enum, enum: TYPES
       # @!attribute length
       #  17-bit session packet length
       #  @return [Integer]
-      define_field :length, PacketGen::Types::Int24
+      define_attr :length, BinStruct::Int24
       # @!attribute body
       #  @return [String]
-      define_field :body, PacketGen::Types::String
+      define_attr :body, BinStruct::String
 
       # Compute and set {#length} field
       # @return [Integer] calculated length

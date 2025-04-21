@@ -33,7 +33,7 @@ module PacketGen::Plugin
     }.freeze
 
     # SMB marker, on start of header
-    MARKER = PacketGen.force_binary("\xfeSMB").freeze
+    MARKER = "\xfeSMB".b.freeze
 
     # SMB2 header size
     HEADER_SIZE = 64
@@ -44,68 +44,28 @@ module PacketGen::Plugin
     # @!attribute protocol
     #  This field must contain {MARKER SMB2 marker}
     #  @return [String]
-    define_field :protocol, PacketGen::Types::String, static_length: 4, default: MARKER
+    define_attr :protocol, BinStruct::String, static_length: 4, default: MARKER
     # @!attribute structure_size
     #  16-bit SMB2 header size. Should be 64.
     #  @return [Integer]
-    define_field :structure_size, PacketGen::Types::Int16le, default: HEADER_SIZE
+    define_attr :structure_size, BinStruct::Int16le, default: HEADER_SIZE
     # @!attribute credit charge
     #  16-bit credit charge field. Must not be used and must be set to 0.
     #  @return [Integer]
-    define_field :credit_charge, PacketGen::Types::Int16le
+    define_attr :credit_charge, BinStruct::Int16le
     # @!attribute status
     #  32-bit status field (SMB 2 dialect only).
     #  @return [Integer]
-    define_field :status, PacketGen::Types::Int32le
+    define_attr :status, BinStruct::Int32le
     # @!attribute command
     #  16-bit command field
     #  @return [Integer]
-    define_field :command, PacketGen::Types::Int16leEnum, enum: COMMANDS
+    define_attr :command, BinStruct::Int16leEnum, enum: COMMANDS
     # @!attribute credit
     #  16-bit credit field. This is the number of credits a client is requesting in
     #  a request, and the number of credits granted in a response.
     #  @return [Integer]
-    define_field :credit, PacketGen::Types::Int16le
-    # @!attribute flags
-    #  32-bit flags field
-    #  @return [Integer]
-    define_field :flags, PacketGen::Types::Int32le
-    # @!attribute next_command
-    #  32-bit offset from the beginning of this SMB2 header to the start of the subsequent
-    #  8-byte aligned SMB2 header (only for compounded requests).
-    #  @return [Integer]
-    define_field :next_command, PacketGen::Types::Int32le
-    # @!attribute message_id
-    #  64-bit alue that identifies a message request and response uniquely across all
-    #  messages that are sent on the same SMB 2 Protocol transport connection.
-    #  @return [Integer]
-    define_field :message_id, PacketGen::Types::Int64le
-    # @!attribute async_id
-    #  64-bit unique ID that is created by the server to handle operations
-    #  asynchronously. Only present for asynchronous messages.
-    #  @return [Integer]
-    define_field :async_id, PacketGen::Types::Int64le, optional: ->(h) { h.flags & 2 == 2 }
-    # @!attribute reserved
-    #  32-bit reserved field.
-    #  Only present for synchronous messages.
-    #  @return [Integer]
-    define_field :reserved, PacketGen::Types::Int32le, optional: ->(h) { (h.flags & 2).zero? }
-    # @!attribute tree_id
-    #  32-bit integer that uniquely identifies the tree connect for the command.
-    #  Only present for synchronous messages.
-    #  @return [Integer]
-    define_field :tree_id, PacketGen::Types::Int32le, optional: ->(h) { (h.flags & 2).zero? }
-    # @!attribute session_id
-    #  64-bit integer that uniquely identifies the established session for the command.
-    #  @return [Integer]
-    define_field :session_id, PacketGen::Types::Int64le
-    # @!attribute signature
-    #  16-byte message signature
-    #  @return [String]
-    define_field :signature, PacketGen::Types::String, static_length: 16, default: [0, 0].pack('qq')
-    # @!attribute body
-    #  @return [String]
-    define_field :body, PacketGen::Types::String
+    define_attr :credit, BinStruct::Int16le
     # @!attribute flags_rsv1
     #  2-bit reserved field
     #  @return [Integer]
@@ -133,11 +93,47 @@ module PacketGen::Plugin
     # @!attribute flags_response?
     #  When set, the message is a response from server to client.
     #  @return [Boolean]
-    define_bit_fields_on :flags,
-                         :flags_rsv1, 2, :flags_smb3_replay_op, :flags_dfs_op,
-                         :flags_rsv2, 21, :flags_smb3_priority, 3,
-                         :flags_signed, :flags_related_op, :flags_async,
-                         :flags_response
+    define_bit_attr :flags, endian: :little,
+                            flags_rsv1: 2, flags_smb3_replay_op: 1, flags_dfs_op: 1,
+                            flags_rsv2: 21, flags_smb3_priority: 3,
+                            flags_signed: 1, flags_related_op: 1, flags_async: 1,
+                            flags_response: 1
+    # @!attribute next_command
+    #  32-bit offset from the beginning of this SMB2 header to the start of the subsequent
+    #  8-byte aligned SMB2 header (only for compounded requests).
+    #  @return [Integer]
+    define_attr :next_command, BinStruct::Int32le
+    # @!attribute message_id
+    #  64-bit alue that identifies a message request and response uniquely across all
+    #  messages that are sent on the same SMB 2 Protocol transport connection.
+    #  @return [Integer]
+    define_attr :message_id, BinStruct::Int64le
+    # @!attribute async_id
+    #  64-bit unique ID that is created by the server to handle operations
+    #  asynchronously. Only present for asynchronous messages.
+    #  @return [Integer]
+    define_attr :async_id, BinStruct::Int64le, optional: ->(h) { h.flags & 2 == 2 }
+    # @!attribute reserved
+    #  32-bit reserved field.
+    #  Only present for synchronous messages.
+    #  @return [Integer]
+    define_attr :reserved, BinStruct::Int32le, optional: ->(h) { h.flags.nobits?(2) }
+    # @!attribute tree_id
+    #  32-bit integer that uniquely identifies the tree connect for the command.
+    #  Only present for synchronous messages.
+    #  @return [Integer]
+    define_attr :tree_id, BinStruct::Int32le, optional: ->(h) { h.flags.nobits?(2) }
+    # @!attribute session_id
+    #  64-bit integer that uniquely identifies the established session for the command.
+    #  @return [Integer]
+    define_attr :session_id, BinStruct::Int64le
+    # @!attribute signature
+    #  16-byte message signature
+    #  @return [String]
+    define_attr :signature, BinStruct::String, static_length: 16, default: [0, 0].pack('qq')
+    # @!attribute body
+    #  @return [String]
+    define_attr :body, BinStruct::String
 
     # Helper to bind a SMB2 command to {SMB2} header.
     # @param [String] command name
@@ -147,7 +143,7 @@ module PacketGen::Plugin
       krequest = self.const_get("#{contantized}::Request")
       kresponse = self.const_get("#{contantized}::Response")
       PacketGen::Header.add_class krequest
-      self.bind krequest, command: SMB2::COMMANDS[command], flags: ->(v) { v.nil? ? 0 : (v & 1).zero? }
+      self.bind krequest, command: SMB2::COMMANDS[command], flags: ->(v) { v.nil? ? 0 : v.nobits?(1) }
       PacketGen::Header.add_class kresponse
       self.bind kresponse, command: SMB2::COMMANDS[command], flags: ->(v) { v.nil? ? 1 : (v & 1 == 1) }
     end
@@ -169,15 +165,13 @@ module PacketGen::Plugin
       super do |attr|
         next unless attr == :flags
 
-        value = bits_on(attr).reject { |_, v| v > 1 }
-                             .keys
-                             .select { |b| send("#{b}?") }
+        value = bits_on(attr).select { |b| respond_to?("#{b}?") && send("#{b}?") }
                              .map(&:to_s)
                              .join(',')
                              .gsub!(/#{attr}_/, '')
         value = '%-16s (0x%02x)' % [value, self[attr].to_i]
         str = PacketGen::Inspect.shift_level
-        str << (PacketGen::Inspect::FMT_ATTR % [self[attr].class.to_s.sub(/.*::/, ''), attr, value])
+        str << (PacketGen::Inspect::FMT_ATTR % [self[attr].type_name, attr, value])
       end
     end
   end
