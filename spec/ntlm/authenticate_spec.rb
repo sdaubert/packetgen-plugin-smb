@@ -30,12 +30,12 @@ module PacketGen::Plugin
           expect(auth.session_key_offset).to eq(474)
           expect(auth.flags).to eq(0x62088215)
           expect(auth.version).to eq([6, 1, 0, 0, 0, 0, 0, 15].pack('C*'))
-          mic = force_binary("\xf4\xc3\x75\xc2\x4f\xa0\x44\xec\xf6\xc6\x4b\x07\xab\x1b\x5e\x3e")
+          mic = "\xf4\xc3\x75\xc2\x4f\xa0\x44\xec\xf6\xc6\x4b\x07\xab\x1b\x5e\x3e".b
           expect(auth.mic).to eq(mic)
         end
 
         it 'sets lm_response' do
-          expect(auth.lm_response).to eq(force_binary("\0" * 24))
+          expect(auth.lm_response).to eq("\0".b * 24)
         end
 
         it 'sets nt_response' do
@@ -96,7 +96,7 @@ module PacketGen::Plugin
           auth.flags_a = true
           auth.domain_name.read('MYDOMAIN')
           auth.calc_length
-          expect(auth.to_s).to end_with(force_binary(utf16le('MYDOMAIN')))
+          expect(auth.to_s).to end_with(utf16le('MYDOMAIN').b)
         end
 
         it 'sets user name in output (no unicode)' do
@@ -109,7 +109,7 @@ module PacketGen::Plugin
           auth.flags_a = true
           auth.user_name.read('USER')
           auth.calc_length
-          expect(auth.to_s).to end_with(force_binary(utf16le('USER')))
+          expect(auth.to_s).to end_with(utf16le('USER').b)
         end
 
         it 'sets workstation in output (no unicode)' do
@@ -122,28 +122,28 @@ module PacketGen::Plugin
           auth.flags_a = true
           auth.workstation.read('WORKSTATION3')
           auth.calc_length
-          expect(auth.to_s).to end_with(force_binary(utf16le('WORKSTATION3')))
+          expect(auth.to_s).to end_with(utf16le('WORKSTATION3').b)
         end
 
         it 'sets session key in output' do
           auth.flags_a = true
           auth.session_key.read('123456789abcdef')
           auth.calc_length
-          expect(auth.to_s).to end_with(force_binary('123456789abcdef'))
+          expect(auth.to_s).to end_with('123456789abcdef'.b)
         end
 
         it 'sets version in output' do
           auth.flags_a = true
           auth[:version].read('12345678')
           auth.calc_length
-          expect(auth.to_s).to include(force_binary('12345678'))
+          expect(auth.to_s).to include('12345678'.b)
         end
 
         it 'sets mic in output' do
           auth.flags_a = true
           auth[:mic].read('123456789abcdef0')
           auth.calc_length
-          expect(auth.to_s).to include(force_binary('123456789abcdef0'))
+          expect(auth.to_s).to include('123456789abcdef0'.b)
         end
       end
     end

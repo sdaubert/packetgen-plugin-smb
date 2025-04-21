@@ -46,7 +46,7 @@ module PacketGen::Plugin
         it 'returns a binary string with filetime encoded as an Int64le' do
           time = Time.utc(2018, 9, 14, 15, 4, 14) + Rational('0.229_239_243')
           ft = Filetime.new(time: time)
-          expect(ft.to_s).to eq(force_binary("\xa8\xe5\x41\x33\x3c\x4c\xd4\x01"))
+          expect(ft.to_s).to eq("\xa8\xe5\x41\x33\x3c\x4c\xd4\x01".b)
         end
       end
 

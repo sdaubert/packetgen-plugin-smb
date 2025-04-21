@@ -30,7 +30,7 @@ module PacketGen::Plugin
     }.freeze
 
     # SMB marker, on start of header
-    MARKER = PacketGen.force_binary("\xffSMB")
+    MARKER = "\xffSMB".b.freeze
 
     # @!attribute protocol
     #  This field must contain {MARKER SMB marker}

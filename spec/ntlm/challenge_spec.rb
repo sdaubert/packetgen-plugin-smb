@@ -56,7 +56,7 @@ module PacketGen::Plugin
         let(:challenge) { Challenge.new }
 
         it 'returns a string' do
-          str = force_binary('NTLMSSP' + [0, 2, 0, 0, 0, 0, 0, 0].pack('CL<QLQQQQ'))
+          str = 'NTLMSSP'.b << [0, 2, 0, 0, 0, 0, 0, 0].pack('CL<QLQQQQ')
           expect(challenge.to_s).to eq(str)
         end
 
@@ -70,14 +70,14 @@ module PacketGen::Plugin
           challenge.flags_a = true
           challenge.target_name.read('MYNAME')
           challenge.calc_length
-          expect(challenge.to_s).to end_with(force_binary(utf16le('MYNAME')))
+          expect(challenge.to_s).to end_with(utf16le('MYNAME').b)
         end
 
         it 'sets target info in output (no unicode)' do
           challenge.target_info << { type: 'DomainName', value: 'DESKTOP-1234567' }
           challenge.target_info << { type: 'EOL', length: 0 }
           challenge.calc_length
-          expect(challenge.to_s).to end_with(force_binary("DESKTOP-1234567\x00\x00\x00\x00"))
+          expect(challenge.to_s).to end_with("DESKTOP-1234567\x00\x00\x00\x00".b)
         end
 
         it 'sets target info in output (unicode)' do
@@ -85,8 +85,7 @@ module PacketGen::Plugin
           challenge.target_info << { type: 'DomainName', value: 'DESKTOP-1234567' }
           challenge.target_info << { type: 'EOL', length: 0 }
           challenge.calc_length
-          expect(challenge.to_s).to end_with(force_binary(utf16le('DESKTOP-1234567')) +
-                                             force_binary("\x00" * 4))
+          expect(challenge.to_s).to end_with(utf16le('DESKTOP-1234567').b << "\x00".b * 4)
         end
       end
     end

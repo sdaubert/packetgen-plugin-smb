@@ -40,7 +40,7 @@ module PacketGen::Plugin
         expect(context.salt_length).to eq(32)
         expect(context.hash_alg.size).to eq(1)
         expect(context.hash_alg.map(&:to_i)).to eq([1])
-        expect(context.salt[0, 4]).to eq(force_binary("\xd5\xec\x0d\x5e"))
+        expect(context.salt[0, 4]).to eq("\xd5\xec\x0d\x5e".b)
         expect(context.pad.size).to eq(2)
 
         context = nego.context_list[1]

@@ -33,7 +33,7 @@ module PacketGen::Plugin
     }.freeze
 
     # SMB marker, on start of header
-    MARKER = PacketGen.force_binary("\xfeSMB").freeze
+    MARKER = "\xfeSMB".b.freeze
 
     # SMB2 header size
     HEADER_SIZE = 64
