@@ -32,11 +32,15 @@ gem 'packetgen-plugin-smb'
 
 And then execute:
 
-    $ bundle
+```bash
+bundle
+```
 
 Or install it yourself as:
 
-    $ gem install packetgen-plugin-smb
+```bash
+gem install packetgen-plugin-smb
+```
 
 ## Usage
 
@@ -79,7 +83,7 @@ You have to manage multicast if you want to make a LLMNR responder. For further 
 
 ## See also
 
-API documentation: http://www.rubydoc.info/gems/packetgen-plugin-smb
+API documentation: <http://www.rubydoc.info/gems/packetgen-plugin-smb>
 
 ## License
 
@@ -87,4 +91,4 @@ MIT License (see [LICENSE](https://github.com/sdaubert/packetgen-plugin-smb/blob
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/sdaubert/packetgen-plugin-smb.
+Bug reports and pull requests are welcome on GitHub at <https://github.com/sdaubert/packetgen-plugin-smb>.

@@ -70,7 +70,7 @@ class LlmnrResponder
       end
       response_pkt.calc
 
-      next unless response_pkt.llmnr.ancount > 0
+      next unless response_pkt.llmnr.ancount.positive?
 
       socket.send(response_pkt.to_s, 0, peer_ip, peer_port)
     end
@@ -105,6 +105,6 @@ end
 
 options = parse_options
 
-check_options options
+check_options(options)
 
 LlmnrResponder.new.start(bind_addr: BIND_ADDR, iface: options[:iface])
